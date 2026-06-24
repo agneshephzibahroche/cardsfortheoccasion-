@@ -205,10 +205,10 @@ button, [type='button'], [type='submit'], [type='reset'] {
 
   .card-button-secondary {
     @apply inline-flex items-center justify-center px-5 py-3
-           bg-white border border-gray-300 text-gray-700 font-heading font-medium tracking-wide
+           bg-white text-gray-700 font-heading font-medium tracking-wide
            rounded-lg hover:bg-gray-100 active:bg-gray-200
            transition-colors duration-150 text-sm uppercase appearance-none
-           dark:bg-stone-800 dark:border-stone-700 dark:text-gray-200 dark:hover:bg-stone-700 dark:active:bg-stone-600;
+           dark:bg-stone-800 dark:text-gray-200 dark:hover:bg-stone-700 dark:active:bg-stone-600;
   }
 
   /* ===== THEME CARD ===== */
