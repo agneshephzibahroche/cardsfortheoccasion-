@@ -16,59 +16,56 @@ export default function HomePage() {
   const themes = Object.entries(THEMES)
 
   return (
-    <div className="min-h-screen paper-bg">
+    <div className="min-h-screen paper-bg relative overflow-x-hidden">
 
-      {/* ── Seamless top: nav + hero in one block ── */}
-      <div className="relative overflow-hidden pb-16">
-        {/* Background floating emojis */}
-        <div className="absolute inset-0 pointer-events-none select-none">
-          {HERO_FLOATS.map((item, i) => (
-            <span
-              key={i}
-              className={`absolute animate-float-slow ${item.size} ${item.opacity}`}
-              style={{ left: item.x, top: item.y, animationDelay: item.delay }}
-            >
-              {item.emoji}
-            </span>
-          ))}
-        </div>
-
-        {/* Nav */}
-        <nav className="relative z-10 px-4 sm:px-6 py-4 flex items-center justify-between max-w-6xl mx-auto">
-          <div className="font-heading font-semibold tracking-wide text-gray-800 dark:text-gray-100 text-lg sm:text-xl">
-            ✉️ Cards for the Occasion
-          </div>
-          <Link href="/create" className="card-button-primary !px-5 !py-2.5 text-sm">
-            Create a Card
-          </Link>
-        </nav>
-
-        {/* Hero */}
-        <section className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16 text-center">
-          <div className="inline-block bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/40 dark:to-purple-900/40 text-pink-700 dark:text-pink-300 text-xs sm:text-sm font-bold px-4 py-1.5 rounded-full mb-5">
-            ✨ Not just for birthdays
-          </div>
-          <h1 className="font-display text-4xl sm:text-6xl md:text-7xl text-gray-900 dark:text-gray-100 leading-tight mb-5">
-            Cards for{' '}
-            <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-              every
-            </span>{' '}
-            occasion
-          </h1>
-          <p className="font-serif text-base sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed">
-            Create a beautiful collaborative card, invite friends to add messages and photos,
-            then surprise your someone special with a magical animated reveal.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/create" className="card-button-primary text-base sm:text-lg px-8 py-4">
-              Create a Card →
-            </Link>
-            <a href="#how-it-works" className="card-button-secondary text-base sm:text-lg px-8 py-4">
-              See how it works
-            </a>
-          </div>
-        </section>
+      {/* Floating emoji decorations — contained to the hero area, behind all content */}
+      <div className="absolute inset-x-0 top-0 h-[560px] pointer-events-none select-none overflow-hidden" aria-hidden="true">
+        {HERO_FLOATS.map((item, i) => (
+          <span
+            key={i}
+            className={`absolute animate-float-slow ${item.size} ${item.opacity}`}
+            style={{ left: item.x, top: item.y, animationDelay: item.delay }}
+          >
+            {item.emoji}
+          </span>
+        ))}
       </div>
+
+      {/* Nav */}
+      <nav className="relative z-10 px-4 sm:px-6 py-4 flex items-center justify-between max-w-6xl mx-auto">
+        <div className="font-heading font-semibold tracking-wide text-gray-800 dark:text-gray-100 text-lg sm:text-xl">
+          ✉️ Cards for the Occasion
+        </div>
+        <Link href="/create" className="card-button-primary !px-5 !py-2.5 text-sm">
+          Create a Card
+        </Link>
+      </nav>
+
+      {/* Hero */}
+      <section className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16 pb-20 text-center">
+        <div className="inline-block bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/40 dark:to-purple-900/40 text-pink-700 dark:text-pink-300 text-xs sm:text-sm font-bold px-4 py-1.5 rounded-full mb-5">
+          ✨ Not just for birthdays
+        </div>
+        <h1 className="font-display text-4xl sm:text-6xl md:text-7xl text-gray-900 dark:text-gray-100 leading-tight mb-5">
+          Cards for{' '}
+          <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
+            every
+          </span>{' '}
+          occasion
+        </h1>
+        <p className="font-serif text-base sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed">
+          Create a beautiful collaborative card, invite friends to add messages and photos,
+          then surprise your someone special with a magical animated reveal.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link href="/create" className="card-button-primary text-base sm:text-lg px-8 py-4">
+            Create a Card →
+          </Link>
+          <a href="#how-it-works" className="card-button-secondary text-base sm:text-lg px-8 py-4">
+            See how it works
+          </a>
+        </div>
+      </section>
 
       {/* ── How it works ── */}
       <section id="how-it-works" className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
