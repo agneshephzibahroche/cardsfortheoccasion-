@@ -47,6 +47,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`${bebas.variable} ${oswald.variable} ${merriweather.variable} ${notoSerif.variable} font-sans antialiased`}>
         {children}
+        <p className="fixed bottom-2 left-0 right-0 text-center text-xs text-gray-300 dark:text-gray-700 pointer-events-none select-none">
+          Made by Agnes Hephzibah Roche
+        </p>
       </body>
     </html>
   )

@@ -136,9 +136,8 @@ export default function HomePage() {
         <Link href="/create" className="card-button-primary text-lg px-10 py-4">Create a Card →</Link>
       </section>
 
-      <footer className="border-t border-gray-100 dark:border-gray-800 py-6 text-center text-gray-400 text-sm space-y-1">
-        <p>Cards for the Occasion</p>
-        <p className="text-xs text-gray-300 dark:text-gray-600">Made by Agnes Hephzibah Roche</p>
+      <footer className="border-t border-gray-100 dark:border-gray-800 py-6 text-center text-gray-400 text-sm">
+        Cards for the Occasion
       </footer>
     </div>
   )
