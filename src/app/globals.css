@@ -190,15 +190,15 @@ body {
   }
 
   .card-button-primary {
-    @apply px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold
-           rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200
-           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 text-base;
+    @apply px-6 py-3 bg-pink-500 text-white font-bold rounded-xl
+           hover:bg-pink-600 active:scale-95 transition-all duration-150
+           disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-pink-500 text-base;
   }
 
   .card-button-secondary {
-    @apply px-5 py-3 bg-white border-2 border-gray-200 text-gray-700 font-semibold
-           rounded-full hover:border-gray-300 hover:shadow-md transition-all duration-200 text-base
-           dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:border-gray-500;
+    @apply px-5 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl
+           hover:bg-gray-200 active:scale-95 transition-all duration-150 text-base
+           dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600;
   }
 
   /* ===== THEME CARD ===== */

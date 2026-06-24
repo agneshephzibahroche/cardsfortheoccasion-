@@ -64,6 +64,7 @@ export default function CreatePage() {
 
   const handlePhotoUpload = async (file: File) => {
     uploadCancelledRef.current = false
+    setError('')
     setPhotoUploading(true)
     const fd = new FormData()
     fd.append('file', file)
@@ -88,7 +89,7 @@ export default function CreatePage() {
   }
 
   const canGoStep2 = form.recipientName.trim() && form.creatorName.trim()
-  const canGoStep3 = form.message.trim().length >= 10
+  const canGoStep3 = form.message.trim().length > 0
 
   const handleSubmit = async () => {
     setSubmitting(true)
@@ -230,15 +231,13 @@ export default function CreatePage() {
                     type="button"
                     onClick={() => update('accentColor', color.value)}
                     title={color.label}
-                    className="w-8 h-8 rounded-full transition-all duration-150"
-                    style={{
-                      backgroundColor: color.value,
-                      transform: form.accentColor === color.value ? 'scale(1.25)' : 'scale(1)',
-                      boxShadow: form.accentColor === color.value
-                        ? `0 0 0 3px white, 0 0 0 5px ${color.value}`
-                        : '0 1px 3px rgba(0,0,0,0.2)',
-                    }}
-                  />
+                    className="relative w-9 h-9 rounded-full transition-all duration-150 hover:scale-110"
+                    style={{ backgroundColor: color.value }}
+                  >
+                    {form.accentColor === color.value && (
+                      <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-base leading-none">✓</span>
+                    )}
+                  </button>
                 ))}
               </div>
               <p className="text-xs text-gray-400 mt-2">Used for the seal, headings, and buttons</p>
@@ -304,8 +303,15 @@ export default function CreatePage() {
               )}
             </div>
 
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700 flex items-center justify-between gap-2">
+                <span>{error}</span>
+                <button type="button" onClick={() => setError('')} className="shrink-0 text-red-400 hover:text-red-600 font-bold">×</button>
+              </div>
+            )}
+
             <div className="flex gap-3">
-              <button className="card-button-secondary flex-1" onClick={() => setStep(1)}>← Back</button>
+              <button className="card-button-secondary flex-1" onClick={() => { setStep(1); setError('') }}>← Back</button>
               <button className="card-button-primary flex-1" disabled={!canGoStep3} onClick={() => setStep(3)}>Next →</button>
             </div>
           </div>

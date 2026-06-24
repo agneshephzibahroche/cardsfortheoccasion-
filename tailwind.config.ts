@@ -11,7 +11,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ['var(--font-nunito)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-pacifico)', 'cursive'],
+        display: ['var(--font-outfit)', 'system-ui', 'sans-serif'],
         handwriting: ['var(--font-caveat)', 'cursive'],
       },
       animation: {
