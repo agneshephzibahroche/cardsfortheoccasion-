@@ -174,6 +174,20 @@ export async function getCardByRevealId(revealId: string): Promise<(DbCard & { c
   return { ...card, contributions: contribs.rows.map(toContribution) }
 }
 
+export async function cleanupOldCards(): Promise<{ revealedDeleted: number; abandonedDeleted: number }> {
+  await ensureSchema()
+  const client = getClient()
+  const revealed = await client.execute({
+    sql: `DELETE FROM cards WHERE has_been_revealed = 1 AND created_at < datetime('now', '-90 days')`,
+    args: [],
+  })
+  const abandoned = await client.execute({
+    sql: `DELETE FROM cards WHERE has_been_revealed = 0 AND created_at < datetime('now', '-30 days')`,
+    args: [],
+  })
+  return { revealedDeleted: revealed.rowsAffected, abandonedDeleted: abandoned.rowsAffected }
+}
+
 export async function saveReaction(revealId: string, reaction: string): Promise<void> {
   await ensureSchema()
   const client = getClient()
