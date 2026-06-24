@@ -8,7 +8,7 @@ export default function HomePage() {
     <div className="min-h-screen paper-bg">
       {/* Nav */}
       <nav className="px-4 sm:px-6 py-4 flex items-center justify-between max-w-6xl mx-auto">
-        <div className="font-display text-lg sm:text-xl text-gray-800 dark:text-gray-100">✉️ Cards for the Occasion</div>
+        <div className="font-heading font-semibold tracking-wide text-gray-800 dark:text-gray-100 text-lg sm:text-xl">✉️ Cards for the Occasion</div>
         <Link href="/create" className="card-button-primary !px-5 !py-2.5 text-sm">
           Create a Card
         </Link>
@@ -59,7 +59,7 @@ export default function HomePage() {
 
       {/* How it works */}
       <section id="how-it-works" className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
-        <h2 className="font-display text-3xl sm:text-4xl text-center text-gray-900 dark:text-gray-100 mb-3">How it works</h2>
+        <h2 className="font-heading text-3xl sm:text-4xl font-semibold tracking-wide text-center text-gray-900 dark:text-gray-100 mb-3">How it works</h2>
         <p className="font-serif text-center text-gray-500 dark:text-gray-400 mb-12 max-w-xl mx-auto text-sm sm:text-base">Three simple steps to create something truly memorable.</p>
         <div className="grid sm:grid-cols-3 gap-6">
           {[
@@ -70,7 +70,7 @@ export default function HomePage() {
             <div key={item.step} className="bg-white dark:bg-gray-800 rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow">
               <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center text-xl sm:text-2xl mb-4 shadow-md`}>{item.emoji}</div>
               <div className="text-xs font-bold text-gray-300 dark:text-gray-500 tracking-widest mb-1">STEP {item.step}</div>
-              <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100 mb-2">{item.title}</h3>
+              <h3 className="font-heading font-semibold text-lg tracking-wide text-gray-900 dark:text-gray-100 mb-2">{item.title}</h3>
               <p className="font-serif text-gray-500 dark:text-gray-400 leading-relaxed text-sm">{item.desc}</p>
             </div>
           ))}
@@ -79,7 +79,7 @@ export default function HomePage() {
 
       {/* Themes */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
-        <h2 className="font-display text-3xl sm:text-4xl text-center text-gray-900 dark:text-gray-100 mb-3">Every occasion deserves a card</h2>
+        <h2 className="font-heading text-3xl sm:text-4xl font-semibold tracking-wide text-center text-gray-900 dark:text-gray-100 mb-3">Every occasion deserves a card</h2>
         <p className="text-center text-gray-500 dark:text-gray-400 mb-10 max-w-xl mx-auto text-sm sm:text-base">Eight beautiful themes, each with its own animations and confetti.</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {themes.map(([key, theme]) => (
@@ -103,7 +103,7 @@ export default function HomePage() {
           ))}
           <div className="relative z-10">
             <div className="text-5xl sm:text-7xl mb-5 animate-float">✉️</div>
-            <h2 className="font-display text-2xl sm:text-4xl mb-4">A reveal like no other</h2>
+            <h2 className="font-heading text-2xl sm:text-4xl font-semibold tracking-wide mb-4">A reveal like no other</h2>
             <p className="font-serif text-white/70 text-sm sm:text-lg max-w-lg mx-auto mb-6">
               The recipient clicks their link and watches their envelope dramatically unseal — confetti, music, and every message tucked inside.
             </p>
@@ -118,7 +118,7 @@ export default function HomePage() {
 
       {/* CTA */}
       <section className="text-center py-16 px-4">
-        <h2 className="font-display text-3xl sm:text-4xl text-gray-900 dark:text-gray-100 mb-3">Ready to make someone&apos;s day?</h2>
+        <h2 className="font-heading text-3xl sm:text-4xl font-semibold tracking-wide text-gray-900 dark:text-gray-100 mb-3">Ready to make someone&apos;s day?</h2>
         <p className="text-gray-500 dark:text-gray-400 mb-7 text-sm sm:text-base">Free, no account needed.</p>
         <Link href="/create" className="card-button-primary text-lg px-10 py-4">Create a Card →</Link>
       </section>

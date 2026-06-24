@@ -154,14 +154,14 @@ export default function ContributePage({ params }: { params: { shareId: string }
         </div>
 
         {isLocked ? (
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 text-center">
+          <div className="bg-white dark:bg-stone-900 border border-gray-100 dark:border-stone-800 rounded-2xl shadow-lg p-8 text-center">
             <div className="text-5xl mb-4">🔒</div>
             <h2 className="font-display text-xl text-gray-800 dark:text-gray-200 mb-2">Contributions are closed</h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm">The creator locked this card on {formatDate(card.lockDate!)}.</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-6 sm:p-8 space-y-4">
-            <h2 className="font-bold text-lg text-gray-900 dark:text-gray-100">Add your message ✍️</h2>
+          <form onSubmit={handleSubmit} className="bg-white dark:bg-stone-900 border border-gray-100 dark:border-stone-800 rounded-2xl shadow-lg p-6 sm:p-8 space-y-4">
+            <h2 className="font-heading font-semibold tracking-wide text-gray-900 dark:text-gray-100">Add your message ✍️</h2>
 
             <div>
               <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Your name *</label>

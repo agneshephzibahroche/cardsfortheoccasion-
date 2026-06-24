@@ -10,9 +10,9 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-oswald)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-merriweather)', 'Georgia', 'serif'],
         display: ['var(--font-bebas)', 'system-ui', 'sans-serif'],
-        serif: ['var(--font-merriweather)', 'Georgia', 'serif'],
+        heading: ['var(--font-oswald)', 'system-ui', 'sans-serif'],
         handwriting: ['var(--font-noto-serif)', 'Georgia', 'serif'],
       },
       animation: {

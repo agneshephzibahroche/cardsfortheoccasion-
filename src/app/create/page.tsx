@@ -33,9 +33,13 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={copy}
-      className="shrink-0 px-3 py-2 text-xs font-bold bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+      className={`shrink-0 px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-md transition-colors ${
+        copied
+          ? 'bg-green-500 text-white'
+          : 'bg-pink-500 hover:bg-pink-600 text-white'
+      }`}
     >
-      {copied ? '✓ Copied!' : 'Copy'}
+      {copied ? '✓ Copied' : 'Copy'}
     </button>
   )
 }
@@ -126,39 +130,39 @@ export default function CreatePage() {
   if (result) {
     return (
       <div className="min-h-screen paper-bg flex flex-col items-center justify-center px-4 py-12">
-        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl max-w-lg w-full p-6 sm:p-8">
+        <div className="bg-white dark:bg-stone-900 border border-gray-100 dark:border-stone-800 rounded-2xl shadow-xl max-w-lg w-full p-6 sm:p-8">
           <div className="text-center mb-6">
             <div className="text-5xl mb-3">{theme.emoji}</div>
-            <h1 className="font-display text-2xl sm:text-3xl text-gray-900 dark:text-gray-100 mb-1">
+            <h1 className="font-heading font-bold text-2xl sm:text-3xl tracking-wide text-gray-900 dark:text-gray-100 mb-1">
               Your card is ready! 🎉
             </h1>
             <p className="text-gray-500 text-sm">Share these two links carefully</p>
           </div>
 
           <div className="mb-5">
-            <div className="flex items-center gap-2 mb-1.5">
+            <div className="flex items-center gap-2 mb-1">
               <span className="text-xl">📤</span>
-              <h3 className="font-bold text-gray-800">Share with friends</h3>
+              <h3 className="font-heading font-semibold tracking-wide text-gray-800 dark:text-gray-200 uppercase text-sm">Share with friends</h3>
             </div>
-            <p className="text-sm text-gray-500 mb-2">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 font-sans">
               Send to everyone adding a message. <strong>Not</strong> to {form.recipientName}!
             </p>
-            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl p-3">
-              <span className="text-xs text-gray-600 truncate flex-1 font-mono">{shareUrl}</span>
+            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+              <span className="text-xs text-gray-500 dark:text-gray-400 truncate flex-1 font-mono">{shareUrl}</span>
               <CopyButton text={shareUrl} />
             </div>
           </div>
 
           <div className="mb-6">
-            <div className="flex items-center gap-2 mb-1.5">
+            <div className="flex items-center gap-2 mb-1">
               <span className="text-xl">🎁</span>
-              <h3 className="font-bold text-gray-800">Reveal link for {form.recipientName}</h3>
+              <h3 className="font-heading font-semibold tracking-wide text-gray-800 dark:text-gray-200 uppercase text-sm">Reveal link for {form.recipientName}</h3>
             </div>
-            <p className="text-sm text-gray-500 mb-2">
-              Send <em>only</em> to {form.recipientName} when ready. First open = full animation!
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 font-sans">
+              Send <em>only</em> to {form.recipientName} when ready.
             </p>
-            <div className="flex items-center gap-2 bg-pink-50 border border-pink-200 rounded-xl p-3">
-              <span className="text-xs text-gray-600 truncate flex-1 font-mono">{revealUrl}</span>
+            <div className="flex items-center gap-2 bg-pink-50 dark:bg-pink-950/40 border border-pink-200 dark:border-pink-900 rounded-lg p-3">
+              <span className="text-xs text-gray-500 dark:text-gray-400 truncate flex-1 font-mono">{revealUrl}</span>
               <CopyButton text={revealUrl} />
             </div>
           </div>
@@ -197,13 +201,13 @@ export default function CreatePage() {
         </div>
       </div>
 
-      <div className="max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-6 sm:p-8">
+      <div className="max-w-xl mx-auto bg-white dark:bg-stone-900 border border-gray-100 dark:border-stone-800 rounded-2xl shadow-lg p-6 sm:p-8">
 
         {/* Step 1 */}
         {step === 1 && (
           <div className="space-y-5 animate-fade-in">
             <div>
-              <h2 className="font-bold text-xl text-gray-900 dark:text-gray-100 mb-0.5">Who is this card for?</h2>
+              <h2 className="font-heading font-semibold text-xl tracking-wide text-gray-900 dark:text-gray-100 mb-0.5">Who is this card for?</h2>
               <p className="text-sm text-gray-500">Let&apos;s start with the basics</p>
             </div>
 
@@ -253,7 +257,7 @@ export default function CreatePage() {
         {step === 2 && (
           <div className="space-y-5 animate-fade-in">
             <div>
-              <h2 className="font-bold text-xl text-gray-900 dark:text-gray-100 mb-0.5">Write your message</h2>
+              <h2 className="font-heading font-semibold text-xl tracking-wide text-gray-900 dark:text-gray-100 mb-0.5">Write your message</h2>
               <p className="text-sm text-gray-500">The first note inside the card</p>
             </div>
 
@@ -321,7 +325,7 @@ export default function CreatePage() {
         {step === 3 && (
           <div className="space-y-5 animate-fade-in">
             <div>
-              <h2 className="font-bold text-xl text-gray-900 dark:text-gray-100 mb-0.5">Optional extras</h2>
+              <h2 className="font-heading font-semibold text-xl tracking-wide text-gray-900 dark:text-gray-100 mb-0.5">Optional extras</h2>
               <p className="text-sm text-gray-500">Make it even more special</p>
             </div>
 
