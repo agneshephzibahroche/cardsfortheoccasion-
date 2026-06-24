@@ -15,6 +15,17 @@ interface CardInfo {
   contributions: { id: string }[]
 }
 
+function getCountdown(lockDate: string): string {
+  const diff = new Date(lockDate).getTime() - Date.now()
+  if (diff <= 0) return ''
+  const days = Math.floor(diff / 86400000)
+  const hours = Math.floor((diff % 86400000) / 3600000)
+  const mins = Math.floor((diff % 3600000) / 60000)
+  if (days > 0) return `${days}d ${hours}h left to contribute`
+  if (hours > 0) return `${hours}h ${mins}m left to contribute`
+  return `${mins}m left to contribute`
+}
+
 function CircleProgress({ pct }: { pct: number }) {
   const r = 18
   const circ = 2 * Math.PI * r
@@ -179,21 +190,37 @@ export default function ContributePage({ params }: { params: { shareId: string }
     <div className={`min-h-screen bg-gradient-to-br ${theme.bg} paper-bg py-8 px-4`}>
       <div className="max-w-lg mx-auto">
         {/* Header */}
-        <div className="rounded-3xl p-6 sm:p-8 mb-5 text-center shadow-sm" style={{ background: theme.cardBg }}>
-          <div className="text-4xl sm:text-5xl mb-3">{theme.emoji}</div>
-          <p className="font-bold text-gray-600 text-sm sm:text-base">{card.creatorName} is creating a card for</p>
-          <h1 className="font-display text-2xl sm:text-3xl mt-1" style={{ color: accent }}>{card.recipientName}!</h1>
-          <div className="flex justify-center gap-1.5 mt-3 text-lg sm:text-xl">
-            {theme.decorations.slice(0, 5).map((d, i) => <span key={i}>{d}</span>)}
+        <div
+          className="rounded-3xl p-6 sm:p-8 mb-5 text-center shadow-md relative overflow-hidden"
+          style={{ background: `linear-gradient(135deg, ${theme.envelopeColor}, ${theme.envelopeFlapColor})` }}
+        >
+          {/* Faint floating decorations */}
+          {theme.decorations.slice(0, 4).map((d, i) => (
+            <span key={i} className="absolute text-2xl animate-float pointer-events-none select-none"
+              style={{ left: `${[8,78,18,85][i]}%`, top: `${[12,8,72,68][i]}%`, opacity: 0.2, animationDelay: `${i * 0.5}s` }}>
+              {d}
+            </span>
+          ))}
+          <div className="relative z-10">
+            <div className="text-4xl sm:text-5xl mb-3">{theme.emoji}</div>
+            <p className="font-bold text-gray-700 text-sm sm:text-base">{card.creatorName} is creating a card for</p>
+            <h1 className="font-display text-2xl sm:text-3xl mt-1" style={{ color: theme.textColor }}>{card.recipientName}!</h1>
+            <div className="flex justify-center gap-1.5 mt-3 text-lg sm:text-xl">
+              {theme.decorations.slice(0, 5).map((d, i) => <span key={i}>{d}</span>)}
+            </div>
           </div>
           {card.contributions.length > 0 && (
             <p className="text-xs text-gray-400 mt-3">
               {card.contributions.length} {card.contributions.length === 1 ? 'person has' : 'people have'} already added a message
             </p>
           )}
-          {isLocked && (
+          {isLocked ? (
             <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 text-xs text-amber-700">
               🔒 Contributions closed on {formatDateTime(card.lockDate!)}
+            </div>
+          ) : card.lockDate && getCountdown(card.lockDate) && (
+            <div className="mt-3 bg-violet-50 border border-violet-200 rounded-xl px-3 py-2 text-xs text-violet-700 font-semibold">
+              ⏳ {getCountdown(card.lockDate)}
             </div>
           )}
         </div>

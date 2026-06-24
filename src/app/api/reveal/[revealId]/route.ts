@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCardByRevealId, markCardRevealed } from '@/lib/db'
+import { getCardByRevealId, markCardRevealed, saveReaction } from '@/lib/db'
 
 export async function POST(
   _request: NextRequest,
@@ -22,6 +22,7 @@ export async function POST(
         playlistUrl: card.playlist_url,
         lockDate: card.lock_date,
         accentColor: card.accent_color,
+        reaction: card.reaction,
         createdAt: card.created_at,
         contributions: card.contributions.map((c) => ({
           id: c.id,
@@ -35,5 +36,20 @@ export async function POST(
   } catch (error) {
     console.error('Error revealing card:', error)
     return NextResponse.json({ error: 'Failed to reveal card' }, { status: 500 })
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { revealId: string } }
+) {
+  try {
+    const { reaction } = await request.json()
+    if (!reaction) return NextResponse.json({ error: 'Missing reaction' }, { status: 400 })
+    await saveReaction(params.revealId, reaction)
+    return NextResponse.json({ ok: true })
+  } catch (error) {
+    console.error('Error saving reaction:', error)
+    return NextResponse.json({ error: 'Failed to save reaction' }, { status: 500 })
   }
 }

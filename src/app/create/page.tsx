@@ -66,6 +66,28 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
+function ShareButton({ url, title }: { url: string; title: string }) {
+  const [done, setDone] = useState(false)
+  if (typeof navigator === 'undefined' || !navigator.share) return null
+  const share = async () => {
+    try {
+      await navigator.share({ title, url })
+      setDone(true)
+      setTimeout(() => setDone(false), 2000)
+    } catch { /* cancelled */ }
+  }
+  return (
+    <button
+      onClick={share}
+      className={`shrink-0 px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-md transition-colors appearance-none ${
+        done ? 'bg-green-500 text-white' : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200'
+      }`}
+    >
+      {done ? '✓' : '↑ Share'}
+    </button>
+  )
+}
+
 export default function CreatePage() {
   const [step, setStep] = useState<Step>(1)
   const [form, setForm] = useState<FormData>({
@@ -195,6 +217,7 @@ export default function CreatePage() {
             </p>
             <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
               <span className="text-xs text-gray-500 dark:text-gray-400 truncate flex-1 font-mono">{shareUrl}</span>
+              <ShareButton url={shareUrl} title={`Add a message to ${form.recipientName}'s card!`} />
               <CopyButton text={shareUrl} />
             </div>
           </div>
@@ -209,6 +232,7 @@ export default function CreatePage() {
             </p>
             <div className="flex items-center gap-2 bg-pink-50 dark:bg-pink-950/40 border border-pink-200 dark:border-pink-900 rounded-lg p-3">
               <span className="text-xs text-gray-500 dark:text-gray-400 truncate flex-1 font-mono">{revealUrl}</span>
+              <ShareButton url={revealUrl} title={`Your card is ready, ${form.recipientName}! 🎉`} />
               <CopyButton text={revealUrl} />
             </div>
           </div>

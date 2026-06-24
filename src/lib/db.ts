@@ -56,11 +56,12 @@ async function ensureSchema(): Promise<void> {
       ],
       'write',
     )
-    // Migration: add accent_color to existing databases
-    try {
-      await client.execute({ sql: 'ALTER TABLE cards ADD COLUMN accent_color TEXT' })
-    } catch {
-      // Column already exists — fine
+    // Migrations
+    for (const sql of [
+      'ALTER TABLE cards ADD COLUMN accent_color TEXT',
+      'ALTER TABLE cards ADD COLUMN reaction TEXT',
+    ]) {
+      try { await client.execute({ sql }) } catch { /* column already exists */ }
     }
   })()
   return schemaReady
@@ -79,6 +80,7 @@ export interface DbCard {
   playlist_url: string | null
   lock_date: string | null
   accent_color: string | null
+  reaction: string | null
   has_been_revealed: number
   created_at: string
 }
@@ -105,6 +107,7 @@ function toCard(row: Row): DbCard {
     playlist_url: row['playlist_url'] as string | null,
     lock_date: row['lock_date'] as string | null,
     accent_color: row['accent_color'] as string | null,
+    reaction: row['reaction'] as string | null,
     has_been_revealed: row['has_been_revealed'] as number,
     created_at: row['created_at'] as string,
   }
@@ -169,6 +172,12 @@ export async function getCardByRevealId(revealId: string): Promise<(DbCard & { c
   const card = toCard(cardResult.rows[0])
   const contribs = await client.execute({ sql: 'SELECT * FROM contributions WHERE card_id = ? ORDER BY created_at ASC', args: [card.id] })
   return { ...card, contributions: contribs.rows.map(toContribution) }
+}
+
+export async function saveReaction(revealId: string, reaction: string): Promise<void> {
+  await ensureSchema()
+  const client = getClient()
+  await client.execute({ sql: 'UPDATE cards SET reaction = ? WHERE reveal_id = ?', args: [reaction, revealId] })
 }
 
 export async function markCardRevealed(revealId: string): Promise<boolean> {

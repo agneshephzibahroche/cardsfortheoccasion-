@@ -24,6 +24,7 @@ interface Card {
   playlistUrl: string | null
   lockDate: string | null
   accentColor: string | null
+  reaction: string | null
   createdAt: string
   contributions: Contribution[]
 }
@@ -31,7 +32,10 @@ interface Card {
 interface EnvelopeRevealProps {
   card: Card
   isFirstReveal: boolean
+  revealId: string
 }
+
+const REACTIONS = ['❤️', '😍', '🥹', '🎉', '😭']
 
 type Phase = 'sealed' | 'hinting' | 'opening' | 'open'
 
@@ -62,10 +66,22 @@ function fireConfetti(colors: string[]) {
   fire(0.1, { spread: 120, startVelocity: 45 })
 }
 
-export default function EnvelopeReveal({ card }: EnvelopeRevealProps) {
+export default function EnvelopeReveal({ card, revealId }: EnvelopeRevealProps) {
   const theme = THEMES[card.theme as ThemeKey] ?? THEMES.birthday
   const accent = card.accentColor || theme.sealColor
   const [phase, setPhase] = useState<Phase>('sealed')
+  const [reaction, setReaction] = useState<string | null>(card.reaction)
+  const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null)
+
+  const handleReaction = async (emoji: string) => {
+    const next = reaction === emoji ? null : emoji
+    setReaction(next)
+    await fetch(`/api/reveal/${revealId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reaction: next ?? '' }),
+    }).catch(() => {})
+  }
 
   const handleOpen = useCallback(() => {
     if (phase !== 'sealed' && phase !== 'hinting') return
@@ -146,7 +162,8 @@ export default function EnvelopeReveal({ card }: EnvelopeRevealProps) {
                       <img
                         src={note.photoUrl}
                         alt=""
-                        className="w-full max-h-52 object-cover"
+                        className="w-full max-h-52 object-cover cursor-zoom-in"
+                        onClick={() => setLightboxPhoto(note.photoUrl!)}
                       />
                     )}
                     {(note.message || note.name) && (
@@ -169,17 +186,71 @@ export default function EnvelopeReveal({ card }: EnvelopeRevealProps) {
             })}
           </div>
 
+          {/* Reactions */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2 }}
+            className="text-center mt-10"
+          >
+            <p className="text-gray-400 text-sm mb-3">How does this make you feel?</p>
+            <div className="flex justify-center gap-2 sm:gap-3">
+              {REACTIONS.map((emoji) => (
+                <button
+                  key={emoji}
+                  onClick={() => handleReaction(emoji)}
+                  className={`text-2xl sm:text-3xl p-2 rounded-full transition-all duration-200 appearance-none ${
+                    reaction === emoji
+                      ? 'bg-white shadow-lg scale-125'
+                      : 'opacity-50 hover:opacity-100 hover:scale-110'
+                  }`}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.4 }}
-            className="text-center text-gray-400 text-xs mt-10"
+            transition={{ delay: 1.6 }}
+            className="text-center text-gray-400 text-xs mt-8"
           >
             Created {formatDate(card.createdAt)} · Cards for the Occasion
           </motion.div>
         </div>
 
         {card.playlistUrl && <MusicPlayer playlistUrl={card.playlistUrl} />}
+
+        {/* Photo lightbox */}
+        <AnimatePresence>
+          {lightboxPhoto && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+              onClick={() => setLightboxPhoto(null)}
+            >
+              <motion.img
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.8 }}
+                src={lightboxPhoto}
+                alt=""
+                className="max-w-full max-h-full object-contain rounded-xl"
+                onClick={(e) => e.stopPropagation()}
+              />
+              <button
+                className="absolute top-4 right-4 w-10 h-10 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center text-xl transition-colors appearance-none"
+                onClick={() => setLightboxPhoto(null)}
+              >
+                ✕
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     )
   }

@@ -14,6 +14,7 @@ interface Card {
   playlistUrl: string | null
   lockDate: string | null
   accentColor: string | null
+  reaction: string | null
   createdAt: string
   contributions: {
     id: string
@@ -74,5 +75,5 @@ export default function RevealPage({ params }: { params: { revealId: string } })
     )
   }
 
-  return <EnvelopeReveal card={card} isFirstReveal={isFirstReveal} />
+  return <EnvelopeReveal card={card} isFirstReveal={isFirstReveal} revealId={params.revealId} />
 }
