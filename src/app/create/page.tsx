@@ -219,7 +219,7 @@ export default function CreatePage() {
           )}
 
           {form.email && (
-            <div className={`rounded-xl p-3 mb-5 text-sm ${result.emailSent ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-amber-50 border border-amber-200 text-amber-800'}`}>
+            <div className={`rounded-xl p-3 mb-5 text-sm ${result.emailSent ? 'bg-green-50 text-green-800' : 'bg-amber-50 text-amber-800'}`}>
               {result.emailSent
                 ? `📧 Links sent to ${form.email}`
                 : `📧 Email couldn't be sent — save the links above manually`}
