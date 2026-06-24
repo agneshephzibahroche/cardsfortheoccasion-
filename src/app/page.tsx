@@ -137,7 +137,7 @@ export default function HomePage() {
       </section>
 
       <footer className="border-t border-gray-100 dark:border-gray-800 py-6 text-center text-gray-400 text-sm">
-        Cards for the Occasion · Made by Agnes Hephzibah Roche
+        Cards for the Occasion
       </footer>
     </div>
   )
