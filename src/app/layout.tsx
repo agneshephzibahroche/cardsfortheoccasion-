@@ -36,6 +36,10 @@ export const metadata: Metadata = {
     description: 'Create beautiful collaborative cards for any occasion.',
     type: 'website',
   },
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#faf7f2' },
+    { media: '(prefers-color-scheme: dark)', color: '#1c1917' },
+  ],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

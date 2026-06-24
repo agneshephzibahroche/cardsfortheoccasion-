@@ -14,10 +14,17 @@
 
 html, body {
   overflow-x: hidden;
+  background-color: #faf7f2;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
+}
+
+@media (prefers-color-scheme: dark) {
+  html, body {
+    background-color: #1c1917;
+  }
 }
 
 /* Kill iOS Safari's native button chrome globally */
