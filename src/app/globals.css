@@ -20,6 +20,12 @@ body {
   color: rgb(var(--foreground-rgb));
 }
 
+/* Kill iOS Safari's native button chrome globally */
+button, [type='button'], [type='submit'], [type='reset'] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 @layer components {
   /* ===== ENVELOPE — fully responsive with clip-path ===== */
   .envelope-scene {
