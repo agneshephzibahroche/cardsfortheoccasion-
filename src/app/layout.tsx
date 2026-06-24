@@ -1,20 +1,22 @@
 import type { Metadata } from 'next'
-import { Inter, Playfair_Display } from 'next/font/google'
+import { Nunito, Pacifico } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({
+const nunito = Nunito({
   subsets: ['latin'],
-  variable: '--font-inter',
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-nunito',
 })
 
-const playfair = Playfair_Display({
+const pacifico = Pacifico({
   subsets: ['latin'],
-  variable: '--font-playfair',
+  weight: ['400'],
+  variable: '--font-pacifico',
 })
 
 export const metadata: Metadata = {
   title: 'Cards for the Occasion',
-  description: 'Beautiful collaborative cards for every occasion — birthdays, graduations, weddings, and more. Invite friends to add messages and photos, then reveal with a magical animation.',
+  description: 'Beautiful collaborative cards for every occasion — birthdays, graduations, weddings, and more.',
   openGraph: {
     title: 'Cards for the Occasion',
     description: 'Create beautiful collaborative cards for any occasion.',
@@ -22,14 +24,10 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
+      <body className={`${nunito.variable} ${pacifico.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>

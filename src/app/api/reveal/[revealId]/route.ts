@@ -8,10 +8,7 @@ export async function POST(
   try {
     const isFirstReveal = await markCardRevealed(params.revealId)
     const card = await getCardByRevealId(params.revealId)
-
-    if (!card) {
-      return NextResponse.json({ error: 'Card not found' }, { status: 404 })
-    }
+    if (!card) return NextResponse.json({ error: 'Card not found' }, { status: 404 })
 
     return NextResponse.json({
       isFirstReveal,
@@ -24,6 +21,7 @@ export async function POST(
         photoUrl: card.photo_url,
         playlistUrl: card.playlist_url,
         lockDate: card.lock_date,
+        accentColor: card.accent_color,
         createdAt: card.created_at,
         contributions: card.contributions.map((c) => ({
           id: c.id,

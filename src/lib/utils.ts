@@ -115,6 +115,21 @@ export const THEMES = {
 
 export type ThemeKey = keyof typeof THEMES
 
+export const ACCENT_COLORS = [
+  { value: '#ec4899', label: 'Pink' },
+  { value: '#a855f7', label: 'Purple' },
+  { value: '#3b82f6', label: 'Blue' },
+  { value: '#06b6d4', label: 'Cyan' },
+  { value: '#10b981', label: 'Emerald' },
+  { value: '#84cc16', label: 'Lime' },
+  { value: '#f59e0b', label: 'Amber' },
+  { value: '#f97316', label: 'Orange' },
+  { value: '#ef4444', label: 'Red' },
+  { value: '#f43f5e', label: 'Rose' },
+  { value: '#8b5cf6', label: 'Violet' },
+  { value: '#14b8a6', label: 'Teal' },
+]
+
 export const STICKY_COLORS = [
   { bg: '#fef9c3', border: '#fde047', shadow: '#ca8a04' },
   { bg: '#dcfce7', border: '#86efac', shadow: '#16a34a' },
@@ -130,32 +145,20 @@ export function getEmbedUrl(url: string): string | null {
   try {
     if (url.includes('spotify.com')) {
       const match = url.match(/spotify\.com\/(playlist|album|track)\/([a-zA-Z0-9]+)/)
-      if (match) {
-        return `https://open.spotify.com/embed/${match[1]}/${match[2]}?utm_source=generator&theme=0`
-      }
+      if (match) return `https://open.spotify.com/embed/${match[1]}/${match[2]}?utm_source=generator&theme=0`
     }
     if (url.includes('youtube.com') || url.includes('youtu.be')) {
       const listMatch = url.match(/[?&]list=([^&]+)/)
-      if (listMatch) {
-        return `https://www.youtube.com/embed/videoseries?list=${listMatch[1]}&autoplay=1`
-      }
+      if (listMatch) return `https://www.youtube.com/embed/videoseries?list=${listMatch[1]}&autoplay=1`
       const vidMatch = url.match(/(?:youtu\.be\/|[?&]v=)([^&]+)/)
-      if (vidMatch) {
-        return `https://www.youtube.com/embed/${vidMatch[1]}?autoplay=1`
-      }
+      if (vidMatch) return `https://www.youtube.com/embed/${vidMatch[1]}?autoplay=1`
     }
-  } catch {
-    return null
-  }
+  } catch { return null }
   return null
 }
 
 export function formatDate(date: string | Date): string {
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
+  return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 
 export function isCardLocked(lockDate: string | Date | null): boolean {

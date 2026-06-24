@@ -7,10 +7,7 @@ export async function GET(
 ) {
   try {
     const card = await getCardByShareId(params.shareId)
-
-    if (!card) {
-      return NextResponse.json({ error: 'Card not found' }, { status: 404 })
-    }
+    if (!card) return NextResponse.json({ error: 'Card not found' }, { status: 404 })
 
     const isLocked = card.lock_date ? new Date() > new Date(card.lock_date) : false
 
@@ -22,6 +19,7 @@ export async function GET(
         recipientName: card.recipient_name,
         theme: card.theme,
         lockDate: card.lock_date,
+        accentColor: card.accent_color,
         createdAt: card.created_at,
         contributions: card.contributions,
       },

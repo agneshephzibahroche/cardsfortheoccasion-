@@ -8,13 +8,10 @@ function getClient(): Client {
   if (!globalForDb.turso) {
     const url = process.env.TURSO_DATABASE_URL ?? 'file:./data/cards.db'
     const authToken = process.env.TURSO_AUTH_TOKEN
-
-    // Ensure local data directory exists for file: URLs (dev only)
     if (url.startsWith('file:')) {
       const filePath = url.replace('file:./', '')
       mkdirSync(path.dirname(path.resolve(filePath)), { recursive: true })
     }
-
     globalForDb.turso = createClient({ url, authToken })
   }
   return globalForDb.turso
@@ -25,8 +22,8 @@ let schemaReady: Promise<void> | null = null
 async function ensureSchema(): Promise<void> {
   if (schemaReady) return schemaReady
   const client = getClient()
-  schemaReady = client
-    .batch(
+  schemaReady = (async () => {
+    await client.batch(
       [
         {
           sql: `CREATE TABLE IF NOT EXISTS cards (
@@ -40,6 +37,7 @@ async function ensureSchema(): Promise<void> {
             photo_url TEXT,
             playlist_url TEXT,
             lock_date TEXT,
+            accent_color TEXT,
             has_been_revealed INTEGER NOT NULL DEFAULT 0,
             created_at TEXT NOT NULL DEFAULT (datetime('now'))
           )`,
@@ -58,7 +56,13 @@ async function ensureSchema(): Promise<void> {
       ],
       'write',
     )
-    .then(() => undefined)
+    // Migration: add accent_color to existing databases
+    try {
+      await client.execute({ sql: 'ALTER TABLE cards ADD COLUMN accent_color TEXT' })
+    } catch {
+      // Column already exists — fine
+    }
+  })()
   return schemaReady
 }
 
@@ -74,6 +78,7 @@ export interface DbCard {
   photo_url: string | null
   playlist_url: string | null
   lock_date: string | null
+  accent_color: string | null
   has_been_revealed: number
   created_at: string
 }
@@ -99,6 +104,7 @@ function toCard(row: Row): DbCard {
     photo_url: row['photo_url'] as string | null,
     playlist_url: row['playlist_url'] as string | null,
     lock_date: row['lock_date'] as string | null,
+    accent_color: row['accent_color'] as string | null,
     has_been_revealed: row['has_been_revealed'] as number,
     created_at: row['created_at'] as string,
   }
@@ -127,84 +133,56 @@ export async function createCard(data: {
   photoUrl?: string
   playlistUrl?: string
   lockDate?: string
+  accentColor?: string
 }): Promise<DbCard> {
   await ensureSchema()
   const client = getClient()
   await client.execute({
-    sql: `INSERT INTO cards (id, share_id, reveal_id, creator_name, recipient_name, theme, message, photo_url, playlist_url, lock_date)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    sql: `INSERT INTO cards (id, share_id, reveal_id, creator_name, recipient_name, theme, message, photo_url, playlist_url, lock_date, accent_color)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     args: [
-      data.id,
-      data.shareId,
-      data.revealId,
-      data.creatorName,
-      data.recipientName,
-      data.theme,
-      data.message,
-      data.photoUrl ?? null,
-      data.playlistUrl ?? null,
-      data.lockDate ?? null,
+      data.id, data.shareId, data.revealId,
+      data.creatorName, data.recipientName, data.theme, data.message,
+      data.photoUrl ?? null, data.playlistUrl ?? null, data.lockDate ?? null,
+      data.accentColor ?? null,
     ],
   })
   const result = await client.execute({ sql: 'SELECT * FROM cards WHERE id = ?', args: [data.id] })
   return toCard(result.rows[0])
 }
 
-export async function getCardByShareId(
-  shareId: string,
-): Promise<(DbCard & { contributions: DbContribution[] }) | null> {
+export async function getCardByShareId(shareId: string): Promise<(DbCard & { contributions: DbContribution[] }) | null> {
   await ensureSchema()
   const client = getClient()
-  const cardResult = await client.execute({
-    sql: 'SELECT * FROM cards WHERE share_id = ?',
-    args: [shareId],
-  })
+  const cardResult = await client.execute({ sql: 'SELECT * FROM cards WHERE share_id = ?', args: [shareId] })
   if (!cardResult.rows[0]) return null
   const card = toCard(cardResult.rows[0])
-  const contribs = await client.execute({
-    sql: 'SELECT * FROM contributions WHERE card_id = ? ORDER BY created_at ASC',
-    args: [card.id],
-  })
+  const contribs = await client.execute({ sql: 'SELECT * FROM contributions WHERE card_id = ? ORDER BY created_at ASC', args: [card.id] })
   return { ...card, contributions: contribs.rows.map(toContribution) }
 }
 
-export async function getCardByRevealId(
-  revealId: string,
-): Promise<(DbCard & { contributions: DbContribution[] }) | null> {
+export async function getCardByRevealId(revealId: string): Promise<(DbCard & { contributions: DbContribution[] }) | null> {
   await ensureSchema()
   const client = getClient()
-  const cardResult = await client.execute({
-    sql: 'SELECT * FROM cards WHERE reveal_id = ?',
-    args: [revealId],
-  })
+  const cardResult = await client.execute({ sql: 'SELECT * FROM cards WHERE reveal_id = ?', args: [revealId] })
   if (!cardResult.rows[0]) return null
   const card = toCard(cardResult.rows[0])
-  const contribs = await client.execute({
-    sql: 'SELECT * FROM contributions WHERE card_id = ? ORDER BY created_at ASC',
-    args: [card.id],
-  })
+  const contribs = await client.execute({ sql: 'SELECT * FROM contributions WHERE card_id = ? ORDER BY created_at ASC', args: [card.id] })
   return { ...card, contributions: contribs.rows.map(toContribution) }
 }
 
 export async function markCardRevealed(revealId: string): Promise<boolean> {
   await ensureSchema()
   const client = getClient()
-  const result = await client.execute({
-    sql: 'SELECT has_been_revealed FROM cards WHERE reveal_id = ?',
-    args: [revealId],
-  })
+  const result = await client.execute({ sql: 'SELECT has_been_revealed FROM cards WHERE reveal_id = ?', args: [revealId] })
   if (!result.rows[0]) return false
   const isFirst = (result.rows[0]['has_been_revealed'] as number) === 0
   if (isFirst) {
-    await client.execute({
-      sql: 'UPDATE cards SET has_been_revealed = 1 WHERE reveal_id = ?',
-      args: [revealId],
-    })
+    await client.execute({ sql: 'UPDATE cards SET has_been_revealed = 1 WHERE reveal_id = ?', args: [revealId] })
   }
   return isFirst
 }
 
-// ── Contribution operations ────────────────────────────────────────
 export async function createContribution(data: {
   id: string
   cardId: string
@@ -215,13 +193,9 @@ export async function createContribution(data: {
   await ensureSchema()
   const client = getClient()
   await client.execute({
-    sql: `INSERT INTO contributions (id, card_id, contributor_name, message, photo_url)
-          VALUES (?, ?, ?, ?, ?)`,
+    sql: `INSERT INTO contributions (id, card_id, contributor_name, message, photo_url) VALUES (?, ?, ?, ?, ?)`,
     args: [data.id, data.cardId, data.contributorName, data.message, data.photoUrl ?? null],
   })
-  const result = await client.execute({
-    sql: 'SELECT * FROM contributions WHERE id = ?',
-    args: [data.id],
-  })
+  const result = await client.execute({ sql: 'SELECT * FROM contributions WHERE id = ?', args: [data.id] })
   return toContribution(result.rows[0])
 }

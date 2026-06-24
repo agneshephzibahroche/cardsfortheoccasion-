@@ -13,6 +13,7 @@ interface Card {
   photoUrl: string | null
   playlistUrl: string | null
   lockDate: string | null
+  accentColor: string | null
   createdAt: string
   contributions: {
     id: string
