@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { shareId, contributorName, message, photoUrl } = body
 
-    if (!shareId || !contributorName || !message) {
+    if (!shareId || (!message && !photoUrl)) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
@@ -24,8 +24,8 @@ export async function POST(request: NextRequest) {
     const contribution = await createContribution({
       id: shortId(12),
       cardId: card.id,
-      contributorName,
-      message,
+      contributorName: contributorName || '',
+      message: message || '',
       photoUrl: photoUrl || undefined,
     })
 

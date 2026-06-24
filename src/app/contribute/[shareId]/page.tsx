@@ -112,7 +112,7 @@ export default function ContributePage({ params }: { params: { shareId: string }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim() || !message.trim()) return
+    if (!message.trim() && !photoUrl) return
     setSubmitting(true)
     setError('')
     try {
@@ -209,13 +209,13 @@ export default function ContributePage({ params }: { params: { shareId: string }
             <h2 className="font-heading font-semibold tracking-wide text-gray-900 dark:text-gray-100">Add your message ✍️</h2>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Your name *</label>
-              <input className="card-input" placeholder="e.g. Alex, Grandma, The whole team…" value={name} onChange={(e) => setName(e.target.value)} required autoFocus />
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Your name <span className="text-gray-400 font-normal">(optional)</span></label>
+              <input className="card-input" placeholder="e.g. Alex, Grandma, The whole team…" value={name} onChange={(e) => setName(e.target.value)} autoFocus />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Your message *</label>
-              <textarea className="card-textarea" rows={4} placeholder={`Write something for ${card.recipientName}…`} value={message} onChange={(e) => setMessage(e.target.value)} required />
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Your message <span className="text-gray-400 font-normal">(optional)</span></label>
+              <textarea className="card-textarea" rows={4} placeholder={`Write something for ${card.recipientName}…`} value={message} onChange={(e) => setMessage(e.target.value)} />
             </div>
 
             <div>
@@ -255,7 +255,7 @@ export default function ContributePage({ params }: { params: { shareId: string }
               type="submit"
               className="w-full py-3.5 text-white font-bold rounded-xl transition-all text-base disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 appearance-none"
               style={{ backgroundColor: accent }}
-              disabled={submitting || !name.trim() || !message.trim()}
+              disabled={submitting || (!message.trim() && !photoUrl)}
             >
               {submitting ? 'Adding…' : '✉️ Add my message'}
             </button>

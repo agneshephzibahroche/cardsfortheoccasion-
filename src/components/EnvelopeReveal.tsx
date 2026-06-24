@@ -136,14 +136,20 @@ export default function EnvelopeReveal({ card }: EnvelopeRevealProps) {
                         className="w-full max-h-52 object-cover"
                       />
                     )}
-                    <div className="p-4 sm:p-5">
-                      <p className="font-handwriting text-gray-800 leading-relaxed text-sm sm:text-base break-words whitespace-pre-wrap">
-                        {note.message}
-                      </p>
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mt-3 pt-3 border-t border-black/10">
-                        ✍️ {note.name}
-                      </p>
-                    </div>
+                    {(note.message || note.name) && (
+                      <div className="p-4 sm:p-5">
+                        {note.message && (
+                          <p className="font-handwriting text-gray-800 leading-relaxed text-sm sm:text-base break-words whitespace-pre-wrap">
+                            {note.message}
+                          </p>
+                        )}
+                        {note.name && (
+                          <p className={`text-xs font-bold text-gray-400 uppercase tracking-wider ${note.message ? 'mt-3 pt-3 border-t border-black/10' : ''}`}>
+                            ✍️ {note.name}
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </motion.div>
                 </div>
               )
