@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { v4 as uuidv4 } from 'uuid'
+import { shortId } from '@/lib/utils'
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
 const MAX_SIZE = 5 * 1024 * 1024
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     if (process.env.BLOB_READ_WRITE_TOKEN) {
       const { put } = await import('@vercel/blob')
       const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-      const blob = await put(`cards/${uuidv4()}.${ext}`, file, { access: 'public' })
+      const blob = await put(`cards/${shortId(16)}.${ext}`, file, { access: 'public' })
       return NextResponse.json({ url: blob.url })
     }
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCardByShareId, createContribution } from '@/lib/db'
-import { v4 as uuidv4 } from 'uuid'
+import { shortId } from '@/lib/utils'
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     const contribution = await createContribution({
-      id: uuidv4(),
+      id: shortId(12),
       cardId: card.id,
       contributorName,
       message,

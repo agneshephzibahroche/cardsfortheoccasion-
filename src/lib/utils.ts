@@ -1,3 +1,11 @@
+import { randomBytes } from 'crypto'
+
+export function shortId(length = 8): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  const bytes = randomBytes(length)
+  return Array.from(bytes).map(b => chars[b % chars.length]).join('')
+}
+
 export const THEMES = {
   birthday: {
     label: 'Birthday',
