@@ -114,7 +114,7 @@ export default function ContributePage({ params }: { params: { shareId: string }
         <div className="bg-white rounded-3xl shadow-xl max-w-md w-full p-8 text-center">
           <div className="text-6xl mb-4 animate-float">🎉</div>
           <h1 className="font-display text-2xl sm:text-3xl text-gray-900 mb-3">Message added!</h1>
-          <p className="text-gray-500 mb-5 leading-relaxed text-sm sm:text-base">
+          <p className="font-serif text-gray-500 mb-5 leading-relaxed text-sm sm:text-base">
             Your message is tucked into {card.recipientName}&apos;s card. They&apos;ll see it when they open their reveal!
           </p>
           <div className="flex justify-center gap-2 text-2xl mb-6">

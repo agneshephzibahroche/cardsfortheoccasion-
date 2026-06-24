@@ -1,23 +1,31 @@
 import type { Metadata } from 'next'
-import { Nunito, Outfit, Caveat } from 'next/font/google'
+import { Bebas_Neue, Oswald, Merriweather, Noto_Serif } from 'next/font/google'
 import './globals.css'
 
-const nunito = Nunito({
+const bebas = Bebas_Neue({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-nunito',
+  weight: ['400'],
+  variable: '--font-bebas',
 })
 
-const outfit = Outfit({
+const oswald = Oswald({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-outfit',
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-oswald',
 })
 
-const caveat = Caveat({
+const merriweather = Merriweather({
+  subsets: ['latin'],
+  weight: ['300', '400', '700', '900'],
+  style: ['normal', 'italic'],
+  variable: '--font-merriweather',
+})
+
+const notoSerif = Noto_Serif({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-  variable: '--font-caveat',
+  style: ['normal', 'italic'],
+  variable: '--font-noto-serif',
 })
 
 export const metadata: Metadata = {
@@ -33,7 +41,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${nunito.variable} ${outfit.variable} ${caveat.variable} font-sans antialiased`}>
+      <body className={`${bebas.variable} ${oswald.variable} ${merriweather.variable} ${notoSerif.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>

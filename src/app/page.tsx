@@ -26,7 +26,7 @@ export default function HomePage() {
           </span>{' '}
           occasion
         </h1>
-        <p className="text-base sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed">
+        <p className="font-serif text-base sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed">
           Create a beautiful collaborative card, invite friends to add messages and photos,
           then surprise your someone special with a magical animated reveal.
         </p>
@@ -60,7 +60,7 @@ export default function HomePage() {
       {/* How it works */}
       <section id="how-it-works" className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
         <h2 className="font-display text-3xl sm:text-4xl text-center text-gray-900 dark:text-gray-100 mb-3">How it works</h2>
-        <p className="text-center text-gray-500 dark:text-gray-400 mb-12 max-w-xl mx-auto text-sm sm:text-base">Three simple steps to create something truly memorable.</p>
+        <p className="font-serif text-center text-gray-500 dark:text-gray-400 mb-12 max-w-xl mx-auto text-sm sm:text-base">Three simple steps to create something truly memorable.</p>
         <div className="grid sm:grid-cols-3 gap-6">
           {[
             { step: '01', emoji: '✍️', title: 'Create your card', desc: 'Pick a theme, colour, and message. Add a photo and a playlist link. Set a lock date so no late additions slip in.', color: 'from-pink-400 to-rose-400' },
@@ -71,7 +71,7 @@ export default function HomePage() {
               <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center text-xl sm:text-2xl mb-4 shadow-md`}>{item.emoji}</div>
               <div className="text-xs font-bold text-gray-300 dark:text-gray-500 tracking-widest mb-1">STEP {item.step}</div>
               <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100 mb-2">{item.title}</h3>
-              <p className="text-gray-500 dark:text-gray-400 leading-relaxed text-sm">{item.desc}</p>
+              <p className="font-serif text-gray-500 dark:text-gray-400 leading-relaxed text-sm">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -104,7 +104,7 @@ export default function HomePage() {
           <div className="relative z-10">
             <div className="text-5xl sm:text-7xl mb-5 animate-float">✉️</div>
             <h2 className="font-display text-2xl sm:text-4xl mb-4">A reveal like no other</h2>
-            <p className="text-white/70 text-sm sm:text-lg max-w-lg mx-auto mb-6">
+            <p className="font-serif text-white/70 text-sm sm:text-lg max-w-lg mx-auto mb-6">
               The recipient clicks their link and watches their envelope dramatically unseal — confetti, music, and every message tucked inside.
             </p>
             <div className="flex flex-wrap justify-center gap-2 text-xs sm:text-sm">

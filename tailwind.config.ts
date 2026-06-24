@@ -10,9 +10,10 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-nunito)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-outfit)', 'system-ui', 'sans-serif'],
-        handwriting: ['var(--font-caveat)', 'cursive'],
+        sans: ['var(--font-oswald)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-bebas)', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-merriweather)', 'Georgia', 'serif'],
+        handwriting: ['var(--font-noto-serif)', 'Georgia', 'serif'],
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
