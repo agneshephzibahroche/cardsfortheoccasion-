@@ -3,10 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import confetti from 'canvas-confetti'
-import StickyNote from './StickyNote'
-import Polaroid from './Polaroid'
 import MusicPlayer from './MusicPlayer'
-import { THEMES, ThemeKey, formatDate } from '@/lib/utils'
+import { THEMES, ThemeKey, STICKY_COLORS, formatDate } from '@/lib/utils'
 
 interface Contribution {
   id: string
@@ -47,10 +45,10 @@ function fireConfetti(colors: string[]) {
   fire(0.1, { spread: 120, startVelocity: 45 })
 }
 
-export default function EnvelopeReveal({ card, isFirstReveal }: EnvelopeRevealProps) {
+export default function EnvelopeReveal({ card }: EnvelopeRevealProps) {
   const theme = THEMES[card.theme as ThemeKey] ?? THEMES.birthday
   const accent = card.accentColor || theme.sealColor
-  const [phase, setPhase] = useState<Phase>(isFirstReveal ? 'sealed' : 'open')
+  const [phase, setPhase] = useState<Phase>('sealed')
 
   const handleOpen = useCallback(() => {
     if (phase !== 'sealed' && phase !== 'hinting') return
@@ -62,73 +60,113 @@ export default function EnvelopeReveal({ card, isFirstReveal }: EnvelopeRevealPr
   }, [phase, theme.confettiColors])
 
   useEffect(() => {
-    if (!isFirstReveal) return
     const hint = setTimeout(() => setPhase('hinting'), 1200)
     return () => clearTimeout(hint)
-  }, [isFirstReveal])
+  }, [])
 
-  const photos = [
-    ...(card.photoUrl ? [{ src: card.photoUrl, caption: card.creatorName }] : []),
-    ...card.contributions.filter((c) => c.photoUrl).map((c) => ({ src: c.photoUrl!, caption: c.contributorName })),
-  ]
-
-  const allMessages = [
-    { contributorName: card.creatorName, message: card.message, id: 'creator' },
-    ...card.contributions.map((c) => ({ contributorName: c.contributorName, message: c.message, id: c.id })),
-  ]
-
-  // ── Open state: full card view ──────────────────────────────────
+  // ── Open state: postcard view ──────────────────────────────────────
   if (phase === 'open') {
     return (
       <div className={`min-h-screen bg-gradient-to-br ${theme.bg} paper-bg`}>
-        <div className="max-w-4xl mx-auto px-4 py-10">
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
-            <div className="text-5xl sm:text-6xl mb-3">{theme.emoji}</div>
+        <div className="max-w-2xl mx-auto px-4 py-10 pb-24">
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
+            <div className="text-5xl mb-3">{theme.emoji}</div>
             <h1 className="font-display text-3xl sm:text-5xl mb-2" style={{ color: accent }}>
               For {card.recipientName}
             </h1>
-            <p className="text-gray-500 text-base sm:text-lg">
-              with love from {card.creatorName}
+            <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">
+              from {card.creatorName}
               {card.contributions.length > 0 && ` & ${card.contributions.length} friend${card.contributions.length > 1 ? 's' : ''}`}
             </p>
             <div className="flex justify-center gap-2 mt-3 flex-wrap">
               {theme.decorations.map((d, i) => (
-                <motion.span key={i} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.1 }} className="text-xl sm:text-2xl animate-float" style={{ animationDelay: `${i * 0.3}s` }}>
+                <motion.span
+                  key={i}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.08 }}
+                  className="text-xl sm:text-2xl animate-float"
+                  style={{ animationDelay: `${i * 0.3}s` }}
+                >
                   {d}
                 </motion.span>
               ))}
             </div>
           </motion.div>
 
-          {allMessages.length > 0 && (
-            <div className="mb-10">
-              <motion.h2 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="text-center text-xs font-bold uppercase tracking-widest text-gray-400 mb-6">
-                Messages inside
-              </motion.h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {allMessages.map((msg, i) => (
-                  <StickyNote key={msg.id} contributorName={msg.contributorName} message={msg.message} index={i} delay={0.4 + i * 0.12} />
-                ))}
+          <div className="space-y-5">
+            {/* Creator's postcard */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 100 }}
+              className="postcard"
+            >
+              <div
+                className="postcard-left"
+                style={{ background: `linear-gradient(135deg, ${theme.envelopeColor}, ${theme.envelopeFlapColor})` }}
+              >
+                {card.photoUrl ? (
+                  <img src={card.photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                ) : (
+                  <>
+                    <span className="text-5xl drop-shadow-sm">{theme.emoji}</span>
+                    <div className="flex flex-wrap justify-center gap-1.5 px-3">
+                      {theme.decorations.slice(0, 4).map((d, i) => <span key={i} className="text-xl">{d}</span>)}
+                    </div>
+                  </>
+                )}
               </div>
-            </div>
-          )}
+              <div className="postcard-right">
+                <div className="postcard-stamp" style={{ borderColor: accent + '80' }}>
+                  <span>{theme.emoji}</span>
+                </div>
+                <p className="postcard-message font-handwriting">{card.message}</p>
+                <p className="postcard-from">✍️ {card.creatorName}</p>
+              </div>
+            </motion.div>
 
-          {photos.length > 0 && (
-            <div className="mb-10">
-              <motion.h2 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-center text-xs font-bold uppercase tracking-widest text-gray-400 mb-6">
-                Photos
-              </motion.h2>
-              <div className="flex flex-wrap justify-center gap-6">
-                {photos.map((photo, i) => (
-                  <div key={i} style={{ width: 160 }}>
-                    <Polaroid src={photo.src} caption={photo.caption} index={i} delay={0.6 + i * 0.15} />
+            {/* Contributor postcards */}
+            {card.contributions.map((c, i) => {
+              const sc = STICKY_COLORS[i % STICKY_COLORS.length]
+              return (
+                <motion.div
+                  key={c.id}
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + i * 0.1, type: 'spring', stiffness: 100 }}
+                  className="postcard"
+                >
+                  <div
+                    className="postcard-left"
+                    style={{ background: `linear-gradient(135deg, ${sc.bg}, ${sc.border})` }}
+                  >
+                    {c.photoUrl ? (
+                      <img src={c.photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-4xl">
+                        {theme.decorations[i % theme.decorations.length] ?? theme.emoji}
+                      </span>
+                    )}
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
+                  <div className="postcard-right">
+                    <div className="postcard-stamp" style={{ borderColor: sc.border }}>
+                      <span>{theme.emoji}</span>
+                    </div>
+                    <p className="postcard-message font-handwriting">{c.message}</p>
+                    <p className="postcard-from">✍️ {c.contributorName}</p>
+                  </div>
+                </motion.div>
+              )
+            })}
+          </div>
 
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="text-center text-gray-400 text-xs">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+            className="text-center text-gray-400 text-xs mt-8"
+          >
             Created {formatDate(card.createdAt)} · Cards for the Occasion
           </motion.div>
         </div>
@@ -138,7 +176,7 @@ export default function EnvelopeReveal({ card, isFirstReveal }: EnvelopeRevealPr
     )
   }
 
-  // ── Sealed / opening state: envelope animation ──────────────────
+  // ── Sealed / opening state: envelope animation ────────────────────
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 px-4">
       {/* Stars */}
@@ -156,17 +194,11 @@ export default function EnvelopeReveal({ card, isFirstReveal }: EnvelopeRevealPr
         {/* Envelope */}
         <div className="envelope-scene">
           <div className="envelope-wrapper cursor-pointer" onClick={handleOpen} style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
-            {/* Base */}
             <div className="absolute inset-0 rounded-lg" style={{ background: theme.envelopeColor }} />
-
-            {/* Side folds */}
             <div className="envelope-left-fold" style={{ background: `${theme.envelopeFlapColor}bb` }} />
             <div className="envelope-right-fold" style={{ background: `${theme.envelopeFlapColor}bb` }} />
-
-            {/* Bottom fold */}
             <div className="envelope-bottom-fold" style={{ background: `${theme.envelopeColor}ee` }} />
 
-            {/* Flap */}
             <motion.div
               className="envelope-flap"
               style={{ background: theme.envelopeFlapColor, transformOrigin: 'top center' }}
@@ -174,7 +206,6 @@ export default function EnvelopeReveal({ card, isFirstReveal }: EnvelopeRevealPr
               transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
             />
 
-            {/* Wax seal */}
             <AnimatePresence>
               {phase !== 'opening' && (
                 <motion.div exit={{ scale: 0, opacity: 0 }} className="wax-seal animate-seal-pulse" style={{ background: accent }}>
@@ -183,7 +214,6 @@ export default function EnvelopeReveal({ card, isFirstReveal }: EnvelopeRevealPr
               )}
             </AnimatePresence>
 
-            {/* Card peek when opening */}
             <AnimatePresence>
               {phase === 'opening' && (
                 <motion.div
@@ -202,7 +232,6 @@ export default function EnvelopeReveal({ card, isFirstReveal }: EnvelopeRevealPr
           </div>
         </div>
 
-        {/* Open button */}
         <AnimatePresence>
           {(phase === 'sealed' || phase === 'hinting') && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ delay: 0.8 }} className="mt-8 text-center">

@@ -6,11 +6,13 @@ const config: Config = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: 'media',
   theme: {
     extend: {
       fontFamily: {
         sans: ['var(--font-nunito)', 'system-ui', 'sans-serif'],
         display: ['var(--font-pacifico)', 'cursive'],
+        handwriting: ['var(--font-caveat)', 'cursive'],
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',

@@ -57,24 +57,34 @@ export default function CreatePage() {
   const [error, setError] = useState('')
   const [result, setResult] = useState<Result | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+  const uploadCancelledRef = useRef(false)
 
   const theme = THEMES[form.theme]
   const update = (field: keyof FormData, value: string) => setForm((f) => ({ ...f, [field]: value }))
 
   const handlePhotoUpload = async (file: File) => {
+    uploadCancelledRef.current = false
     setPhotoUploading(true)
     const fd = new FormData()
     fd.append('file', file)
     try {
       const res = await fetch('/api/upload', { method: 'POST', body: fd })
       const data = await res.json()
-      if (data.url) update('photoUrl', data.url)
-      else setError(data.error || 'Upload failed')
+      if (!uploadCancelledRef.current) {
+        if (data.url) update('photoUrl', data.url)
+        else setError(data.error || 'Upload failed')
+      }
     } catch {
-      setError('Upload failed')
+      if (!uploadCancelledRef.current) setError('Upload failed')
     } finally {
       setPhotoUploading(false)
     }
+  }
+
+  const skipPhoto = () => {
+    uploadCancelledRef.current = true
+    setPhotoUploading(false)
+    update('photoUrl', '')
   }
 
   const canGoStep2 = form.recipientName.trim() && form.creatorName.trim()
@@ -115,10 +125,10 @@ export default function CreatePage() {
   if (result) {
     return (
       <div className="min-h-screen paper-bg flex flex-col items-center justify-center px-4 py-12">
-        <div className="bg-white rounded-3xl shadow-xl max-w-lg w-full p-6 sm:p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl max-w-lg w-full p-6 sm:p-8">
           <div className="text-center mb-6">
             <div className="text-5xl mb-3">{theme.emoji}</div>
-            <h1 className="font-display text-2xl sm:text-3xl text-gray-900 mb-1">
+            <h1 className="font-display text-2xl sm:text-3xl text-gray-900 dark:text-gray-100 mb-1">
               Your card is ready! 🎉
             </h1>
             <p className="text-gray-500 text-sm">Share these two links carefully</p>
@@ -175,9 +185,9 @@ export default function CreatePage() {
   return (
     <div className="min-h-screen paper-bg py-8 px-4">
       <div className="max-w-xl mx-auto mb-6">
-        <Link href="/" className="text-sm text-gray-400 hover:text-gray-600 transition-colors">← Back</Link>
-        <h1 className="font-display text-2xl sm:text-3xl text-gray-900 mt-3 mb-0.5">Create your card</h1>
-        <p className="text-gray-500 text-sm">Step {step} of 3</p>
+        <Link href="/" className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">← Back</Link>
+        <h1 className="font-display text-2xl sm:text-3xl text-gray-900 dark:text-gray-100 mt-3 mb-0.5">Create your card</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">Step {step} of 3</p>
         <div className="h-1.5 bg-gray-100 rounded-full mt-3 overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-pink-400 to-purple-400 rounded-full transition-all duration-500"
@@ -186,33 +196,33 @@ export default function CreatePage() {
         </div>
       </div>
 
-      <div className="max-w-xl mx-auto bg-white rounded-3xl shadow-xl p-6 sm:p-8">
+      <div className="max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-6 sm:p-8">
 
         {/* Step 1 */}
         {step === 1 && (
           <div className="space-y-5 animate-fade-in">
             <div>
-              <h2 className="font-bold text-xl text-gray-900 mb-0.5">Who is this card for?</h2>
+              <h2 className="font-bold text-xl text-gray-900 dark:text-gray-100 mb-0.5">Who is this card for?</h2>
               <p className="text-sm text-gray-500">Let&apos;s start with the basics</p>
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">Recipient&apos;s name *</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Recipient&apos;s name *</label>
               <input className="card-input" placeholder="e.g. Sarah, Mom, Dr. Rivera…" value={form.recipientName} onChange={(e) => update('recipientName', e.target.value)} autoFocus />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">Your name *</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Your name *</label>
               <input className="card-input" placeholder="e.g. Jamie" value={form.creatorName} onChange={(e) => update('creatorName', e.target.value)} />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Occasion *</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Occasion *</label>
               <ThemeSelector selected={form.theme} onChange={(t) => update('theme', t)} />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Card colour</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Card colour</label>
               <div className="flex flex-wrap gap-2.5">
                 {ACCENT_COLORS.map((color) => (
                   <button
@@ -244,12 +254,12 @@ export default function CreatePage() {
         {step === 2 && (
           <div className="space-y-5 animate-fade-in">
             <div>
-              <h2 className="font-bold text-xl text-gray-900 mb-0.5">Write your message</h2>
+              <h2 className="font-bold text-xl text-gray-900 dark:text-gray-100 mb-0.5">Write your message</h2>
               <p className="text-sm text-gray-500">The first note inside the card</p>
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">
                 Your message to {form.recipientName} *
               </label>
               <textarea
@@ -264,23 +274,33 @@ export default function CreatePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">Add a photo (optional)</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Add a photo (optional)</label>
               {form.photoUrl ? (
                 <div className="relative">
                   <img src={form.photoUrl} alt="Uploaded" className="w-full h-36 object-cover rounded-xl" />
                   <button onClick={() => update('photoUrl', '')} className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full text-sm font-bold hover:bg-red-600">×</button>
                 </div>
               ) : (
-                <div
-                  className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-pink-300 hover:bg-pink-50/30 transition-all"
-                  onClick={() => fileRef.current?.click()}
-                >
-                  <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f) }} />
-                  {photoUploading
-                    ? <div className="text-gray-400 animate-pulse">Uploading…</div>
-                    : <><div className="text-3xl mb-1">📸</div><p className="text-sm text-gray-500">Tap to upload a photo</p><p className="text-xs text-gray-400">JPG, PNG, GIF · Max 5MB</p></>
-                  }
-                </div>
+                <>
+                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f) }} />
+                {photoUploading ? (
+                  <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
+                    <div className="text-gray-400 animate-pulse mb-2">Uploading…</div>
+                    <button type="button" onClick={skipPhoto} className="text-xs text-gray-400 hover:text-red-500 underline transition-colors">
+                      Skip photo
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-pink-300 hover:bg-pink-50/30 transition-all"
+                    onClick={() => fileRef.current?.click()}
+                  >
+                    <div className="text-3xl mb-1">📸</div>
+                    <p className="text-sm text-gray-500">Tap to upload a photo</p>
+                    <p className="text-xs text-gray-400">JPG, PNG, GIF · Max 5MB · Optional</p>
+                  </div>
+                )}
+                </>
               )}
             </div>
 
@@ -295,18 +315,18 @@ export default function CreatePage() {
         {step === 3 && (
           <div className="space-y-5 animate-fade-in">
             <div>
-              <h2 className="font-bold text-xl text-gray-900 mb-0.5">Optional extras</h2>
+              <h2 className="font-bold text-xl text-gray-900 dark:text-gray-100 mb-0.5">Optional extras</h2>
               <p className="text-sm text-gray-500">Make it even more special</p>
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">🎵 Playlist link (optional)</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">🎵 Playlist link (optional)</label>
               <input className="card-input" placeholder="Spotify or YouTube URL" value={form.playlistUrl} onChange={(e) => update('playlistUrl', e.target.value)} />
               <p className="text-xs text-gray-400 mt-1">Plays softly as they read</p>
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">🔒 Lock date (optional)</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">🔒 Lock date (optional)</label>
               <input type="date" className="card-input" value={form.lockDate} min={new Date().toISOString().split('T')[0]} onChange={(e) => update('lockDate', e.target.value)} />
               <p className="text-xs text-gray-400 mt-1">No messages accepted after this date</p>
             </div>

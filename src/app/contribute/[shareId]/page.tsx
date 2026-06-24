@@ -30,6 +30,7 @@ export default function ContributePage({ params }: { params: { shareId: string }
   const [error, setError] = useState('')
 
   const fileRef = useRef<HTMLInputElement>(null)
+  const uploadCancelledRef = useRef(false)
 
   useEffect(() => {
     fetch(`/api/cards/${params.shareId}`)
@@ -43,16 +44,25 @@ export default function ContributePage({ params }: { params: { shareId: string }
   }, [params.shareId])
 
   const handlePhotoUpload = async (file: File) => {
+    uploadCancelledRef.current = false
     setUploading(true)
     const fd = new FormData()
     fd.append('file', file)
     try {
       const res = await fetch('/api/upload', { method: 'POST', body: fd })
       const data = await res.json()
-      if (data.url) setPhotoUrl(data.url)
-      else setError(data.error || 'Upload failed')
-    } catch { setError('Upload failed') }
+      if (!uploadCancelledRef.current) {
+        if (data.url) setPhotoUrl(data.url)
+        else setError(data.error || 'Upload failed')
+      }
+    } catch { if (!uploadCancelledRef.current) setError('Upload failed') }
     finally { setUploading(false) }
+  }
+
+  const skipPhoto = () => {
+    uploadCancelledRef.current = true
+    setUploading(false)
+    setPhotoUrl('')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -144,40 +154,50 @@ export default function ContributePage({ params }: { params: { shareId: string }
         </div>
 
         {isLocked ? (
-          <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 text-center">
             <div className="text-5xl mb-4">🔒</div>
-            <h2 className="font-display text-xl text-gray-800 mb-2">Contributions are closed</h2>
-            <p className="text-gray-500 text-sm">The creator locked this card on {formatDate(card.lockDate!)}.</p>
+            <h2 className="font-display text-xl text-gray-800 dark:text-gray-200 mb-2">Contributions are closed</h2>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">The creator locked this card on {formatDate(card.lockDate!)}.</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 space-y-4">
-            <h2 className="font-bold text-lg text-gray-900">Add your message ✍️</h2>
+          <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-6 sm:p-8 space-y-4">
+            <h2 className="font-bold text-lg text-gray-900 dark:text-gray-100">Add your message ✍️</h2>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">Your name *</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Your name *</label>
               <input className="card-input" placeholder="e.g. Alex, Grandma, The whole team…" value={name} onChange={(e) => setName(e.target.value)} required autoFocus />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">Your message *</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Your message *</label>
               <textarea className="card-textarea" rows={4} placeholder={`Write something for ${card.recipientName}…`} value={message} onChange={(e) => setMessage(e.target.value)} required />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">Add a photo (optional)</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Add a photo (optional)</label>
               {photoUrl ? (
                 <div className="relative">
                   <img src={photoUrl} alt="Uploaded" className="w-full h-32 object-cover rounded-xl" />
                   <button type="button" onClick={() => setPhotoUrl('')} className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full text-sm font-bold">×</button>
                 </div>
               ) : (
-                <div className="border-2 border-dashed border-gray-200 rounded-xl p-5 text-center cursor-pointer hover:border-pink-300 hover:bg-pink-50/30 transition-all" onClick={() => fileRef.current?.click()}>
+                <>
                   <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f) }} />
-                  {uploading
-                    ? <div className="text-gray-400 animate-pulse text-sm">Uploading…</div>
-                    : <><div className="text-2xl mb-1">📸</div><p className="text-sm text-gray-500">Tap to add a photo</p></>
-                  }
-                </div>
+                  {uploading ? (
+                    <div className="border-2 border-dashed border-gray-200 rounded-xl p-5 text-center">
+                      <div className="text-gray-400 animate-pulse text-sm mb-2">Uploading…</div>
+                      <button type="button" onClick={skipPhoto} className="text-xs text-gray-400 hover:text-red-500 underline transition-colors">
+                        Skip photo
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-gray-200 rounded-xl p-5 text-center cursor-pointer hover:border-pink-300 hover:bg-pink-50/30 transition-all" onClick={() => fileRef.current?.click()}>
+                      <div className="text-2xl mb-1">📸</div>
+                      <p className="text-sm text-gray-500">Tap to add a photo</p>
+                      <p className="text-xs text-gray-400 mt-0.5">Optional — skip if you prefer</p>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Nunito, Pacifico } from 'next/font/google'
+import { Nunito, Pacifico, Caveat } from 'next/font/google'
 import './globals.css'
 
 const nunito = Nunito({
@@ -12,6 +12,12 @@ const pacifico = Pacifico({
   subsets: ['latin'],
   weight: ['400'],
   variable: '--font-pacifico',
+})
+
+const caveat = Caveat({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-caveat',
 })
 
 export const metadata: Metadata = {
@@ -27,7 +33,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${nunito.variable} ${pacifico.variable} font-sans antialiased`}>
+      <body className={`${nunito.variable} ${pacifico.variable} ${caveat.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>

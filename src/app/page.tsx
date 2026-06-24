@@ -8,7 +8,7 @@ export default function HomePage() {
     <div className="min-h-screen paper-bg">
       {/* Nav */}
       <nav className="px-4 sm:px-6 py-4 flex items-center justify-between max-w-6xl mx-auto">
-        <div className="font-display text-lg sm:text-xl text-gray-800">✉️ Cards for the Occasion</div>
+        <div className="font-display text-lg sm:text-xl text-gray-800 dark:text-gray-100">✉️ Cards for the Occasion</div>
         <Link href="/create" className="card-button-primary !px-5 !py-2.5 text-sm">
           Create a Card
         </Link>
@@ -16,17 +16,17 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-10 pb-16 text-center">
-        <div className="inline-block bg-gradient-to-r from-pink-100 to-purple-100 text-pink-700 text-xs sm:text-sm font-bold px-4 py-1.5 rounded-full mb-5">
+        <div className="inline-block bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/40 dark:to-purple-900/40 text-pink-700 dark:text-pink-300 text-xs sm:text-sm font-bold px-4 py-1.5 rounded-full mb-5">
           ✨ Not just for birthdays
         </div>
-        <h1 className="font-display text-4xl sm:text-6xl md:text-7xl text-gray-900 leading-tight mb-5">
+        <h1 className="font-display text-4xl sm:text-6xl md:text-7xl text-gray-900 dark:text-gray-100 leading-tight mb-5">
           Cards for{' '}
           <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
             every
           </span>{' '}
           occasion
         </h1>
-        <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto mb-8 leading-relaxed">
+        <p className="text-base sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed">
           Create a beautiful collaborative card, invite friends to add messages and photos,
           then surprise your someone special with a magical animated reveal.
         </p>
@@ -59,19 +59,19 @@ export default function HomePage() {
 
       {/* How it works */}
       <section id="how-it-works" className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
-        <h2 className="font-display text-3xl sm:text-4xl text-center text-gray-900 mb-3">How it works</h2>
-        <p className="text-center text-gray-500 mb-12 max-w-xl mx-auto text-sm sm:text-base">Three simple steps to create something truly memorable.</p>
+        <h2 className="font-display text-3xl sm:text-4xl text-center text-gray-900 dark:text-gray-100 mb-3">How it works</h2>
+        <p className="text-center text-gray-500 dark:text-gray-400 mb-12 max-w-xl mx-auto text-sm sm:text-base">Three simple steps to create something truly memorable.</p>
         <div className="grid sm:grid-cols-3 gap-6">
           {[
             { step: '01', emoji: '✍️', title: 'Create your card', desc: 'Pick a theme, colour, and message. Add a photo and a playlist link. Set a lock date so no late additions slip in.', color: 'from-pink-400 to-rose-400' },
             { step: '02', emoji: '📤', title: 'Invite friends', desc: 'Share a link with anyone. They add their own messages and photos — no account needed, just open and write.', color: 'from-purple-400 to-indigo-400' },
             { step: '03', emoji: '🎉', title: 'Magical reveal', desc: 'Send the recipient their reveal link. The envelope dramatically unseals with animations, confetti, and music.', color: 'from-amber-400 to-orange-400' },
           ].map((item) => (
-            <div key={item.step} className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
+            <div key={item.step} className="bg-white dark:bg-gray-800 rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow">
               <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center text-xl sm:text-2xl mb-4 shadow-md`}>{item.emoji}</div>
-              <div className="text-xs font-bold text-gray-300 tracking-widest mb-1">STEP {item.step}</div>
-              <h3 className="font-bold text-lg text-gray-900 mb-2">{item.title}</h3>
-              <p className="text-gray-500 leading-relaxed text-sm">{item.desc}</p>
+              <div className="text-xs font-bold text-gray-300 dark:text-gray-500 tracking-widest mb-1">STEP {item.step}</div>
+              <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100 mb-2">{item.title}</h3>
+              <p className="text-gray-500 dark:text-gray-400 leading-relaxed text-sm">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -79,12 +79,12 @@ export default function HomePage() {
 
       {/* Themes */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
-        <h2 className="font-display text-3xl sm:text-4xl text-center text-gray-900 mb-3">Every occasion deserves a card</h2>
-        <p className="text-center text-gray-500 mb-10 max-w-xl mx-auto text-sm sm:text-base">Eight beautiful themes, each with its own animations and confetti.</p>
+        <h2 className="font-display text-3xl sm:text-4xl text-center text-gray-900 dark:text-gray-100 mb-3">Every occasion deserves a card</h2>
+        <p className="text-center text-gray-500 dark:text-gray-400 mb-10 max-w-xl mx-auto text-sm sm:text-base">Eight beautiful themes, each with its own animations and confetti.</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {themes.map(([key, theme]) => (
             <Link key={key} href="/create"
-              className="group p-4 rounded-2xl border-2 border-transparent hover:border-gray-200 hover:shadow-lg transition-all duration-200 hover:-translate-y-1 text-center"
+              className="group p-4 rounded-2xl border-2 border-transparent hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-lg transition-all duration-200 hover:-translate-y-1 text-center"
               style={{ background: `linear-gradient(135deg, ${theme.envelopeColor}, ${theme.envelopeFlapColor}50)` }}
             >
               <div className="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform">{theme.emoji}</div>
@@ -108,7 +108,7 @@ export default function HomePage() {
               The recipient clicks their link and watches their envelope dramatically unseal — confetti, music, and every message tucked inside.
             </p>
             <div className="flex flex-wrap justify-center gap-2 text-xs sm:text-sm">
-              {['✨ 3D envelope', '🎊 Confetti', '🎵 Music', '📝 Sticky notes', '📸 Polaroids', '🔒 Lock date'].map((f) => (
+              {['✨ 3D envelope', '🎊 Confetti', '🎵 Music', '📮 Postcards', '📸 Photos', '🔒 Lock date'].map((f) => (
                 <span key={f} className="px-3 py-1.5 bg-white/10 rounded-full text-white/80">{f}</span>
               ))}
             </div>
@@ -118,12 +118,12 @@ export default function HomePage() {
 
       {/* CTA */}
       <section className="text-center py-16 px-4">
-        <h2 className="font-display text-3xl sm:text-4xl text-gray-900 mb-3">Ready to make someone&apos;s day?</h2>
-        <p className="text-gray-500 mb-7 text-sm sm:text-base">Free, no account needed.</p>
+        <h2 className="font-display text-3xl sm:text-4xl text-gray-900 dark:text-gray-100 mb-3">Ready to make someone&apos;s day?</h2>
+        <p className="text-gray-500 dark:text-gray-400 mb-7 text-sm sm:text-base">Free, no account needed.</p>
         <Link href="/create" className="card-button-primary text-lg px-10 py-4">Create a Card →</Link>
       </section>
 
-      <footer className="border-t border-gray-100 py-6 text-center text-gray-400 text-sm">
+      <footer className="border-t border-gray-100 dark:border-gray-800 py-6 text-center text-gray-400 text-sm">
         Cards for the Occasion · Made with ❤️ for every milestone
       </footer>
     </div>
