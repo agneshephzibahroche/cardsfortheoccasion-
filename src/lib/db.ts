@@ -206,6 +206,13 @@ export async function markCardRevealed(revealId: string): Promise<boolean> {
   return isFirst
 }
 
+export async function deleteContribution(id: string): Promise<boolean> {
+  await ensureSchema()
+  const client = getClient()
+  const result = await client.execute({ sql: 'DELETE FROM contributions WHERE id = ?', args: [id] })
+  return result.rowsAffected > 0
+}
+
 export async function createContribution(data: {
   id: string
   cardId: string

@@ -60,6 +60,9 @@ export default function ContributePage({ params }: { params: { shareId: string }
   const [uploadProgress, setUploadProgress] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [submittedId, setSubmittedId] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [deleted, setDeleted] = useState(false)
   const [error, setError] = useState('')
 
   const fileRef = useRef<HTMLInputElement>(null)
@@ -134,6 +137,7 @@ export default function ContributePage({ params }: { params: { shareId: string }
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed')
+      setSubmittedId(data.id)
       setSubmitted(true)
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Something went wrong')
@@ -164,6 +168,26 @@ export default function ContributePage({ params }: { params: { shareId: string }
   const theme = THEMES[card.theme as ThemeKey] ?? THEMES.birthday
   const accent = card.accentColor || theme.accent
 
+  const handleDelete = async () => {
+    if (!submittedId || deleting) return
+    setDeleting(true)
+    setError('')
+    try {
+      const res = await fetch(`/api/contributions/${submittedId}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Failed to delete')
+      setDeleted(true)
+      setSubmitted(false)
+      setSubmittedId(null)
+      setName('')
+      setMessage('')
+      setPhotoUrl('')
+    } catch {
+      setError('Could not remove message. Try again.')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   if (submitted) {
     return (
       <div className={`min-h-screen bg-gradient-to-br ${theme.bg} flex items-center justify-center px-4`}>
@@ -178,8 +202,33 @@ export default function ContributePage({ params }: { params: { shareId: string }
               <span key={i} className="animate-float" style={{ animationDelay: `${i * 0.2}s` }}>{d}</span>
             ))}
           </div>
-          <button onClick={() => { setSubmitted(false); setName(''); setMessage(''); setPhotoUrl('') }} className="card-button-secondary appearance-none">
-            Add another message
+          <div className="flex flex-col gap-3">
+            <button onClick={() => { setSubmitted(false); setSubmittedId(null); setName(''); setMessage(''); setPhotoUrl('') }} className="card-button-secondary appearance-none">
+              Add another message
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="text-sm text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50 appearance-none"
+            >
+              {deleting ? 'Removing…' : 'Remove my message'}
+            </button>
+            {error && <p className="text-xs text-red-500">{error}</p>}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (deleted) {
+    return (
+      <div className={`min-h-screen bg-gradient-to-br ${theme.bg} flex items-center justify-center px-4`}>
+        <div className="bg-white rounded-3xl shadow-xl max-w-md w-full p-8 text-center">
+          <div className="text-6xl mb-4">🗑️</div>
+          <h1 className="font-display text-2xl text-gray-900 mb-3">Message removed</h1>
+          <p className="font-serif text-gray-500 mb-6 text-sm">Your message has been deleted from the card.</p>
+          <button onClick={() => setDeleted(false)} className="card-button-secondary appearance-none">
+            Add a new message
           </button>
         </div>
       </div>
