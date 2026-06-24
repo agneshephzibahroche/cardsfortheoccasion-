@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: { shareId: string } }
 ) {
   try {
-    const card = getCardByShareId(params.shareId)
+    const card = await getCardByShareId(params.shareId)
 
     if (!card) {
       return NextResponse.json({ error: 'Card not found' }, { status: 404 })

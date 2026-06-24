@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const card = createCard({
+    const card = await createCard({
       id: uuidv4(),
       shareId: uuidv4(),
       revealId: uuidv4(),

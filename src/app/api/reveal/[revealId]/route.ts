@@ -6,8 +6,8 @@ export async function POST(
   { params }: { params: { revealId: string } }
 ) {
   try {
-    const isFirstReveal = markCardRevealed(params.revealId)
-    const card = getCardByRevealId(params.revealId)
+    const isFirstReveal = await markCardRevealed(params.revealId)
+    const card = await getCardByRevealId(params.revealId)
 
     if (!card) {
       return NextResponse.json({ error: 'Card not found' }, { status: 404 })

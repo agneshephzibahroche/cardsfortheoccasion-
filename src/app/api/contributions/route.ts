@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const card = getCardByShareId(shareId)
+    const card = await getCardByShareId(shareId)
 
     if (!card) {
       return NextResponse.json({ error: 'Card not found' }, { status: 404 })
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Contributions are closed for this card' }, { status: 403 })
     }
 
-    const contribution = createContribution({
+    const contribution = await createContribution({
       id: uuidv4(),
       cardId: card.id,
       contributorName,
