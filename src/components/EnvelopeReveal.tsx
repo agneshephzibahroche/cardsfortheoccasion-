@@ -39,6 +39,19 @@ type Phase = 'sealed' | 'hinting' | 'opening' | 'open'
 const ROTATIONS = [-2, 1.5, -1.2, 2.5, -1.8, 1, -2.2, 0.8, -1.5, 2, -0.5, 1.8]
 const FLOAT_DELAYS = ['0s', '1.2s', '2.1s', '0.5s', '1.7s', '0.9s', '2.4s', '0.3s', '1.5s', '2.8s', '0.7s', '1.9s']
 
+const BG_FLOATS = [
+  { x: '6%',  y: '10%', delay: '0s',   size: 'text-3xl', opacity: 0.18 },
+  { x: '84%', y: '7%',  delay: '0.9s', size: 'text-2xl', opacity: 0.15 },
+  { x: '75%', y: '60%', delay: '1.5s', size: 'text-4xl', opacity: 0.12 },
+  { x: '12%', y: '68%', delay: '0.4s', size: 'text-3xl', opacity: 0.18 },
+  { x: '48%', y: '86%', delay: '1.1s', size: 'text-2xl', opacity: 0.13 },
+  { x: '91%', y: '38%', delay: '0.6s', size: 'text-3xl', opacity: 0.15 },
+  { x: '4%',  y: '42%', delay: '1.8s', size: 'text-2xl', opacity: 0.12 },
+  { x: '62%', y: '14%', delay: '0.2s', size: 'text-4xl', opacity: 0.16 },
+  { x: '30%', y: '25%', delay: '1.3s', size: 'text-2xl', opacity: 0.10 },
+  { x: '55%', y: '50%', delay: '0.7s', size: 'text-3xl', opacity: 0.12 },
+]
+
 function fireConfetti(colors: string[]) {
   const fire = (ratio: number, opts: confetti.Options) =>
     confetti({ ...opts, origin: { y: 0.55 }, colors, particleCount: Math.floor(200 * ratio) })
@@ -173,22 +186,34 @@ export default function EnvelopeReveal({ card }: EnvelopeRevealProps) {
 
   // ── Sealed / opening state: envelope animation ────────────────────
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 px-4">
-      {/* Stars */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {Array.from({ length: 40 }).map((_, i) => (
-          <div key={i} className="absolute rounded-full bg-white opacity-50" style={{ width: Math.random() * 2 + 1, height: Math.random() * 2 + 1, top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%` }} />
+    <div
+      className="min-h-screen flex flex-col items-center justify-center relative px-4 overflow-hidden"
+      style={{ background: `linear-gradient(160deg, #0d0d1a 0%, ${theme.sealColor}33 50%, #0d0d1a 100%)` }}
+    >
+      {/* Floating theme decorations in background */}
+      <div className="absolute inset-0 pointer-events-none select-none">
+        {BG_FLOATS.map((pos, i) => (
+          <span
+            key={i}
+            className={`absolute animate-float-slow ${pos.size}`}
+            style={{ left: pos.x, top: pos.y, animationDelay: pos.delay, opacity: pos.opacity }}
+          >
+            {theme.decorations[i % theme.decorations.length]}
+          </span>
         ))}
       </div>
 
       <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, type: 'spring', stiffness: 100 }} className="relative z-10 flex flex-col items-center w-full">
-        <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="text-white/60 text-xs sm:text-sm tracking-widest uppercase mb-5">
-          Something special for {card.recipientName}
-        </motion.p>
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="text-center mb-6">
+          <p className="text-white/50 text-xs tracking-widest uppercase mb-1">{theme.label} card</p>
+          <p className="font-display text-2xl sm:text-3xl" style={{ color: theme.envelopeFlapColor }}>
+            Something special for {card.recipientName}
+          </p>
+        </motion.div>
 
         {/* Envelope */}
         <div className="envelope-scene">
-          <div className="envelope-wrapper cursor-pointer" onClick={handleOpen} style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
+          <div className="envelope-wrapper cursor-pointer" onClick={handleOpen} style={{ boxShadow: `0 20px 60px ${theme.sealColor}55` }}>
             <div className="absolute inset-0 rounded-lg" style={{ background: theme.envelopeColor }} />
             <div className="envelope-left-fold" style={{ background: `${theme.envelopeFlapColor}bb` }} />
             <div className="envelope-right-fold" style={{ background: `${theme.envelopeFlapColor}bb` }} />
@@ -234,11 +259,15 @@ export default function EnvelopeReveal({ card }: EnvelopeRevealProps) {
                 animate={phase === 'hinting' ? { scale: [1, 1.06, 1] } : {}}
                 transition={{ repeat: Infinity, duration: 1.4 }}
                 onClick={handleOpen}
-                className="px-7 py-3.5 text-white font-bold rounded-full border-2 border-white/20 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all text-base sm:text-lg"
+                className="px-8 py-4 text-white font-bold rounded-full transition-all text-base sm:text-lg shadow-lg appearance-none"
+                style={{ backgroundColor: accent, boxShadow: `0 4px 24px ${accent}66` }}
               >
-                Open your card ✉️
+                Open your card {theme.emoji}
               </motion.button>
-              <p className="text-white/40 text-xs sm:text-sm mt-2">Tap to unseal</p>
+              <p className="text-white/40 text-xs sm:text-sm mt-3">
+                from {card.creatorName}
+                {card.contributions.length > 0 && ` & ${card.contributions.length} other${card.contributions.length > 1 ? 's' : ''}`}
+              </p>
             </motion.div>
           )}
         </AnimatePresence>
