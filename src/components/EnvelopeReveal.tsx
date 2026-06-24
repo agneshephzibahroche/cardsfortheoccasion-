@@ -35,6 +35,10 @@ interface EnvelopeRevealProps {
 
 type Phase = 'sealed' | 'hinting' | 'opening' | 'open'
 
+// Fixed rotations and float delays per index — deterministic, no Math.random
+const ROTATIONS = [-2, 1.5, -1.2, 2.5, -1.8, 1, -2.2, 0.8, -1.5, 2, -0.5, 1.8]
+const FLOAT_DELAYS = ['0s', '1.2s', '2.1s', '0.5s', '1.7s', '0.9s', '2.4s', '0.3s', '1.5s', '2.8s', '0.7s', '1.9s']
+
 function fireConfetti(colors: string[]) {
   const fire = (ratio: number, opts: confetti.Options) =>
     confetti({ ...opts, origin: { y: 0.55 }, colors, particleCount: Math.floor(200 * ratio) })
@@ -64,12 +68,21 @@ export default function EnvelopeReveal({ card }: EnvelopeRevealProps) {
     return () => clearTimeout(hint)
   }, [])
 
-  // ── Open state: postcard view ──────────────────────────────────────
+  // ── Open state: floating note cards ──────────────────────────────────
   if (phase === 'open') {
+    const creatorNote = { name: card.creatorName, message: card.message, photoUrl: card.photoUrl, isCreator: true }
+    const allNotes = [creatorNote, ...card.contributions.map(c => ({ name: c.contributorName, message: c.message, photoUrl: c.photoUrl, isCreator: false }))]
+
     return (
       <div className={`min-h-screen bg-gradient-to-br ${theme.bg} paper-bg`}>
-        <div className="max-w-2xl mx-auto px-4 py-10 pb-24">
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
+        <div className="max-w-5xl mx-auto px-4 pt-10 pb-28">
+
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-10"
+          >
             <div className="text-5xl mb-3">{theme.emoji}</div>
             <h1 className="font-display text-3xl sm:text-5xl mb-2" style={{ color: accent }}>
               For {card.recipientName}
@@ -86,7 +99,7 @@ export default function EnvelopeReveal({ card }: EnvelopeRevealProps) {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: i * 0.08 }}
                   className="text-xl sm:text-2xl animate-float"
-                  style={{ animationDelay: `${i * 0.3}s` }}
+                  style={{ animationDelay: `${i * 0.35}s` }}
                 >
                   {d}
                 </motion.span>
@@ -94,69 +107,45 @@ export default function EnvelopeReveal({ card }: EnvelopeRevealProps) {
             </div>
           </motion.div>
 
-          <div className="space-y-5">
-            {/* Creator's postcard */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 100 }}
-              className="postcard"
-            >
-              <div
-                className="postcard-left"
-                style={{ background: `linear-gradient(135deg, ${theme.envelopeColor}, ${theme.envelopeFlapColor})` }}
-              >
-                {card.photoUrl ? (
-                  <img src={card.photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                ) : (
-                  <>
-                    <span className="text-5xl drop-shadow-sm">{theme.emoji}</span>
-                    <div className="flex flex-wrap justify-center gap-1.5 px-3">
-                      {theme.decorations.slice(0, 4).map((d, i) => <span key={i} className="text-xl">{d}</span>)}
-                    </div>
-                  </>
-                )}
-              </div>
-              <div className="postcard-right">
-                <div className="postcard-stamp" style={{ borderColor: accent + '80' }}>
-                  <span>{theme.emoji}</span>
-                </div>
-                <p className="postcard-message font-handwriting">{card.message}</p>
-                <p className="postcard-from">✍️ {card.creatorName}</p>
-              </div>
-            </motion.div>
-
-            {/* Contributor postcards */}
-            {card.contributions.map((c, i) => {
+          {/* Floating note cards */}
+          <div className="flex flex-wrap justify-center gap-5 sm:gap-7">
+            {allNotes.map((note, i) => {
+              const rotation = ROTATIONS[i % ROTATIONS.length]
+              const floatDelay = FLOAT_DELAYS[i % FLOAT_DELAYS.length]
               const sc = STICKY_COLORS[i % STICKY_COLORS.length]
+              const bg = note.isCreator ? theme.cardBg : sc.bg
+              const border = note.isCreator ? accent : sc.border
+
               return (
-                <motion.div
-                  key={c.id}
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + i * 0.1, type: 'spring', stiffness: 100 }}
-                  className="postcard"
+                <div
+                  key={i}
+                  className="animate-float"
+                  style={{ animationDelay: floatDelay }}
                 >
-                  <div
-                    className="postcard-left"
-                    style={{ background: `linear-gradient(135deg, ${sc.bg}, ${sc.border})` }}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8, y: 40, rotate: rotation + (rotation > 0 ? 3 : -3) }}
+                    animate={{ opacity: 1, scale: 1, y: 0, rotate: rotation }}
+                    transition={{ delay: 0.15 + i * 0.1, type: 'spring', stiffness: 90, damping: 15 }}
+                    className="rounded-2xl shadow-xl overflow-hidden w-60 sm:w-72"
+                    style={{ background: bg, borderTop: `4px solid ${border}` }}
                   >
-                    {c.photoUrl ? (
-                      <img src={c.photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-4xl">
-                        {theme.decorations[i % theme.decorations.length] ?? theme.emoji}
-                      </span>
+                    {note.photoUrl && (
+                      <img
+                        src={note.photoUrl}
+                        alt=""
+                        className="w-full max-h-52 object-cover"
+                      />
                     )}
-                  </div>
-                  <div className="postcard-right">
-                    <div className="postcard-stamp" style={{ borderColor: sc.border }}>
-                      <span>{theme.emoji}</span>
+                    <div className="p-4 sm:p-5">
+                      <p className="font-handwriting text-gray-800 leading-relaxed text-sm sm:text-base break-words whitespace-pre-wrap">
+                        {note.message}
+                      </p>
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mt-3 pt-3 border-t border-black/10">
+                        ✍️ {note.name}
+                      </p>
                     </div>
-                    <p className="postcard-message font-handwriting">{c.message}</p>
-                    <p className="postcard-from">✍️ {c.contributorName}</p>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </div>
               )
             })}
           </div>
@@ -164,8 +153,8 @@ export default function EnvelopeReveal({ card }: EnvelopeRevealProps) {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
-            className="text-center text-gray-400 text-xs mt-8"
+            transition={{ delay: 1.4 }}
+            className="text-center text-gray-400 text-xs mt-10"
           >
             Created {formatDate(card.createdAt)} · Cards for the Occasion
           </motion.div>

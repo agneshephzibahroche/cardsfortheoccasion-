@@ -205,7 +205,7 @@ export default function ContributePage({ params }: { params: { shareId: string }
 
             <button
               type="submit"
-              className="w-full py-3.5 text-white font-bold rounded-xl transition-all text-base disabled:opacity-40 disabled:cursor-not-allowed active:scale-95"
+              className="w-full py-3.5 text-white font-bold rounded-xl transition-all text-base disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 appearance-none"
               style={{ backgroundColor: accent }}
               disabled={submitting || !name.trim() || !message.trim()}
             >
