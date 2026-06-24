@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import confetti from 'canvas-confetti'
 import MusicPlayer from './MusicPlayer'
@@ -72,6 +72,59 @@ export default function EnvelopeReveal({ card, revealId }: EnvelopeRevealProps) 
   const [phase, setPhase] = useState<Phase>('sealed')
   const [reaction, setReaction] = useState<string | null>(card.reaction)
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null)
+  const [capturing, setCapturing] = useState(false)
+  const captureRef = useRef<HTMLDivElement>(null)
+
+  const downloadHtml = () => {
+    const notes = [
+      { name: card.creatorName, message: card.message, photoUrl: card.photoUrl, isCreator: true },
+      ...card.contributions.map(c => ({ name: c.contributorName, message: c.message, photoUrl: c.photoUrl, isCreator: false })),
+    ]
+    const noteHtml = notes.map((note, i) => {
+      const sc = STICKY_COLORS[i % STICKY_COLORS.length]
+      const bg = note.isCreator ? theme.cardBg : sc.bg
+      const border = note.isCreator ? accent : sc.border
+      const rot = [-2, 1.5, -1.2, 2.5, -1.8, 1][i % 6]
+      return `<div style="background:${bg};border-top:4px solid ${border};border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.12);width:260px;overflow:hidden;transform:rotate(${rot}deg);flex-shrink:0">
+        ${note.photoUrl ? `<img src="${note.photoUrl}" style="width:100%;max-height:200px;object-fit:cover;display:block" crossorigin="anonymous"/>` : ''}
+        ${(note.message || note.name) ? `<div style="padding:16px 20px">${note.message ? `<p style="margin:0 0 12px;font-family:Georgia,serif;font-size:15px;line-height:1.6;color:#1f2937;white-space:pre-wrap">${note.message.replace(/</g, '&lt;')}</p>` : ''}${note.name ? `<p style="margin:0;font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.08em;border-top:1px solid rgba(0,0,0,.08);padding-top:10px">✍️ ${note.name.replace(/</g, '&lt;')}</p>` : ''}</div>` : ''}
+      </div>`
+    }).join('\n')
+
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Card for ${card.recipientName}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;background:${theme.bg.includes('from') ? theme.cardBg : theme.cardBg};min-height:100vh;padding:40px 20px 60px}.header{text-align:center;margin-bottom:40px}.notes{display:flex;flex-wrap:wrap;gap:24px;justify-content:center;max-width:960px;margin:0 auto}.footer{text-align:center;margin-top:48px;font-size:12px;color:#9ca3af}</style></head><body><div class="header"><div style="font-size:56px;margin-bottom:12px">${theme.emoji}</div><div style="font-size:36px;font-weight:900;color:${accent}">${card.recipientName}</div><div style="font-size:14px;color:#6b7280;margin-top:6px">from ${card.creatorName}${card.contributions.length > 0 ? ` &amp; ${card.contributions.length} friend${card.contributions.length > 1 ? 's' : ''}` : ''}</div></div><div class="notes">${noteHtml}</div><div class="footer">${theme.label} card &middot; ${new Date(card.createdAt).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})} &middot; Cards for the Occasion</div></body></html>`
+
+    const blob = new Blob([html], { type: 'text/html' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `card-for-${card.recipientName.toLowerCase().replace(/\s+/g, '-')}.html`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const downloadImage = async () => {
+    if (!captureRef.current) return
+    setCapturing(true)
+    try {
+      const html2canvas = (await import('html2canvas')).default
+      const canvas = await html2canvas(captureRef.current, {
+        useCORS: true,
+        scale: 2,
+        backgroundColor: theme.cardBg,
+      })
+      canvas.toBlob((blob) => {
+        if (!blob) return
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `card-for-${card.recipientName.toLowerCase().replace(/\s+/g, '-')}.png`
+        a.click()
+        URL.revokeObjectURL(url)
+      })
+    } finally {
+      setCapturing(false)
+    }
+  }
 
   const handleReaction = async (emoji: string) => {
     const next = reaction === emoji ? null : emoji
@@ -105,6 +158,7 @@ export default function EnvelopeReveal({ card, revealId }: EnvelopeRevealProps) 
     return (
       <div className={`min-h-screen bg-gradient-to-br ${theme.bg} paper-bg`}>
         <div className="max-w-5xl mx-auto px-4 pt-10 pb-28">
+          <div ref={captureRef} style={{ background: theme.cardBg, borderRadius: 24, padding: capturing ? 32 : 0 }}>
 
           {/* Header */}
           <motion.div
@@ -185,6 +239,30 @@ export default function EnvelopeReveal({ card, revealId }: EnvelopeRevealProps) 
               )
             })}
           </div>
+
+          </div>{/* end captureRef */}
+
+          {/* Download */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0 }}
+            className="flex justify-center gap-3 mt-8"
+          >
+            <button
+              onClick={downloadHtml}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-stone-800 rounded-xl text-sm font-heading font-semibold text-gray-700 dark:text-gray-200 shadow hover:shadow-md transition-all appearance-none"
+            >
+              📄 Download HTML
+            </button>
+            <button
+              onClick={downloadImage}
+              disabled={capturing}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-stone-800 rounded-xl text-sm font-heading font-semibold text-gray-700 dark:text-gray-200 shadow hover:shadow-md transition-all appearance-none disabled:opacity-50"
+            >
+              {capturing ? '⏳ Capturing…' : '🖼️ Save as image'}
+            </button>
+          </motion.div>
 
           {/* Reactions */}
           <motion.div
