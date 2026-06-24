@@ -110,7 +110,7 @@ export default function EnvelopeReveal({ card, revealId }: EnvelopeRevealProps) 
       const canvas = await html2canvas(captureRef.current, {
         useCORS: true,
         scale: 2,
-        backgroundColor: theme.cardBg,
+        backgroundColor: '#ffffff',
       })
       canvas.toBlob((blob) => {
         if (!blob) return
@@ -158,7 +158,7 @@ export default function EnvelopeReveal({ card, revealId }: EnvelopeRevealProps) 
     return (
       <div className={`min-h-screen bg-gradient-to-br ${theme.bg} paper-bg`}>
         <div className="max-w-5xl mx-auto px-4 pt-10 pb-28">
-          <div ref={captureRef} style={{ background: theme.cardBg, borderRadius: 24, padding: capturing ? 32 : 0 }}>
+          <div ref={captureRef} style={{ background: '#ffffff', borderRadius: 24, padding: capturing ? 32 : 0 }}>
 
           {/* Header */}
           <motion.div
@@ -196,7 +196,7 @@ export default function EnvelopeReveal({ card, revealId }: EnvelopeRevealProps) 
               const rotation = ROTATIONS[i % ROTATIONS.length]
               const floatDelay = FLOAT_DELAYS[i % FLOAT_DELAYS.length]
               const sc = STICKY_COLORS[i % STICKY_COLORS.length]
-              const bg = note.isCreator ? theme.cardBg : sc.bg
+              const bg = '#ffffff'
               const border = note.isCreator ? accent : sc.border
 
               return (
