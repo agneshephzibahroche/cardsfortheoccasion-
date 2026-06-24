@@ -74,7 +74,7 @@ export default function HomePage() {
         <div className="grid sm:grid-cols-3 gap-6">
           {[
             { step: '01', emoji: '✍️', title: 'Create your card', desc: 'Pick a theme, colour, and message. Add a photo and a playlist link. Set a lock date so no late additions slip in.', color: 'from-pink-400 to-rose-400' },
-            { step: '02', emoji: '📤', title: 'Invite friends', desc: 'Share a link with anyone. They add their own messages and photos — no account needed, just open and write.', color: 'from-purple-400 to-indigo-400' },
+            { step: '02', emoji: '📤', title: 'Invite friends', desc: 'Share a link with anyone. They open it, write their message, and add a photo — done in seconds.', color: 'from-purple-400 to-indigo-400' },
             { step: '03', emoji: '🎉', title: 'Magical reveal', desc: 'Send the recipient their reveal link. The envelope dramatically unseals with animations, confetti, and music.', color: 'from-amber-400 to-orange-400' },
           ].map((item) => (
             <div key={item.step} className="bg-white dark:bg-gray-800 rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow">
@@ -128,8 +128,7 @@ export default function HomePage() {
 
       {/* ── CTA ── */}
       <section className="text-center py-16 px-4">
-        <h2 className="font-heading text-3xl sm:text-4xl font-semibold tracking-wide text-gray-900 dark:text-gray-100 mb-3">Ready to make someone&apos;s day?</h2>
-        <p className="text-gray-500 dark:text-gray-400 mb-7 text-sm sm:text-base">Free, no account needed.</p>
+        <h2 className="font-heading text-3xl sm:text-4xl font-semibold tracking-wide text-gray-900 dark:text-gray-100 mb-7">Ready to make someone&apos;s day?</h2>
         <Link href="/create" className="card-button-primary text-lg px-10 py-4">Create a Card →</Link>
       </section>
 

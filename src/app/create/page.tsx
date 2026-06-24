@@ -16,11 +16,33 @@ interface FormData {
   photoUrl: string
   playlistUrl: string
   lockDate: string
+  email: string
 }
 
 interface Result {
   shareId: string
   revealId: string
+}
+
+function CircleProgress({ pct }: { pct: number }) {
+  const r = 18
+  const circ = 2 * Math.PI * r
+  return (
+    <svg width="48" height="48" viewBox="0 0 44 44">
+      <circle cx="22" cy="22" r={r} fill="none" stroke="#e5e7eb" strokeWidth="3" />
+      <circle
+        cx="22" cy="22" r={r} fill="none"
+        stroke="#ec4899" strokeWidth="3" strokeLinecap="round"
+        strokeDasharray={circ}
+        strokeDashoffset={circ - (pct / 100) * circ}
+        transform="rotate(-90 22 22)"
+        style={{ transition: 'stroke-dashoffset 0.15s linear' }}
+      />
+      <text x="22" y="26" textAnchor="middle" fill="#6b7280" fontSize="9" fontWeight="600">
+        {pct}%
+      </text>
+    </svg>
+  )
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -33,10 +55,8 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={copy}
-      className={`shrink-0 px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-md transition-colors ${
-        copied
-          ? 'bg-green-500 text-white'
-          : 'bg-pink-500 hover:bg-pink-600 text-white'
+      className={`shrink-0 px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-md transition-colors appearance-none ${
+        copied ? 'bg-green-500 text-white' : 'bg-pink-500 hover:bg-pink-600 text-white'
       }`}
     >
       {copied ? '✓ Copied' : 'Copy'}
@@ -55,40 +75,62 @@ export default function CreatePage() {
     photoUrl: '',
     playlistUrl: '',
     lockDate: '',
+    email: '',
   })
   const [photoUploading, setPhotoUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [result, setResult] = useState<Result | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const uploadCancelledRef = useRef(false)
+  const xhrRef = useRef<XMLHttpRequest | null>(null)
 
   const theme = THEMES[form.theme]
   const update = (field: keyof FormData, value: string) => setForm((f) => ({ ...f, [field]: value }))
 
-  const handlePhotoUpload = async (file: File) => {
+  const handlePhotoUpload = (file: File) => {
     uploadCancelledRef.current = false
     setError('')
     setPhotoUploading(true)
+    setUploadProgress(0)
+
     const fd = new FormData()
     fd.append('file', file)
-    try {
-      const res = await fetch('/api/upload', { method: 'POST', body: fd })
-      const data = await res.json()
-      if (!uploadCancelledRef.current) {
-        if (data.url) update('photoUrl', data.url)
+
+    const xhr = new XMLHttpRequest()
+    xhrRef.current = xhr
+
+    xhr.upload.onprogress = (e) => {
+      if (uploadCancelledRef.current) return
+      if (e.lengthComputable) setUploadProgress(Math.round((e.loaded / e.total) * 92))
+    }
+
+    xhr.onload = () => {
+      if (uploadCancelledRef.current) return
+      try {
+        const data = JSON.parse(xhr.responseText)
+        if (data.url) { update('photoUrl', data.url); setUploadProgress(100) }
         else setError(data.error || 'Upload failed')
-      }
-    } catch {
-      if (!uploadCancelledRef.current) setError('Upload failed')
-    } finally {
+      } catch { setError('Upload failed') }
       setPhotoUploading(false)
     }
+
+    xhr.onerror = () => {
+      if (!uploadCancelledRef.current) setError('Upload failed')
+      setPhotoUploading(false)
+    }
+
+    xhr.open('POST', '/api/upload')
+    xhr.send(fd)
   }
 
   const skipPhoto = () => {
     uploadCancelledRef.current = true
+    xhrRef.current?.abort()
+    xhrRef.current = null
     setPhotoUploading(false)
+    setUploadProgress(0)
     update('photoUrl', '')
   }
 
@@ -111,6 +153,7 @@ export default function CreatePage() {
           photoUrl: form.photoUrl || undefined,
           playlistUrl: form.playlistUrl || undefined,
           lockDate: form.lockDate || undefined,
+          email: form.email || undefined,
         }),
       })
       const data = await res.json()
@@ -126,6 +169,7 @@ export default function CreatePage() {
   const origin = typeof window !== 'undefined' ? window.location.origin : ''
   const shareUrl = result ? `${origin}/contribute/${result.shareId}` : ''
   const revealUrl = result ? `${origin}/reveal/${result.revealId}` : ''
+  const lockDateLocal = form.lockDate ? new Date(form.lockDate).toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : ''
 
   if (result) {
     return (
@@ -169,14 +213,20 @@ export default function CreatePage() {
 
           {form.lockDate && (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-5 text-sm text-amber-800">
-              🔒 Closes {new Date(form.lockDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
+              🔒 Closes {lockDateLocal}
+            </div>
+          )}
+
+          {form.email && (
+            <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-5 text-sm text-green-800">
+              📧 Links sent to {form.email}
             </div>
           )}
 
           <div className="flex gap-3">
             <Link href="/" className="card-button-secondary flex-1 text-center">Home</Link>
             <button
-              onClick={() => { setResult(null); setStep(1); setForm({ recipientName: '', creatorName: '', theme: 'birthday', accentColor: '#ec4899', message: '', photoUrl: '', playlistUrl: '', lockDate: '' }) }}
+              onClick={() => { setResult(null); setStep(1); setForm({ recipientName: '', creatorName: '', theme: 'birthday', accentColor: '#ec4899', message: '', photoUrl: '', playlistUrl: '', lockDate: '', email: '' }) }}
               className="card-button-primary flex-1"
             >
               Create another
@@ -235,7 +285,7 @@ export default function CreatePage() {
                     type="button"
                     onClick={() => update('accentColor', color.value)}
                     title={color.label}
-                    className="relative w-9 h-9 rounded-full transition-all duration-150 hover:scale-110"
+                    className="relative w-9 h-9 rounded-full transition-all duration-150 hover:scale-110 appearance-none"
                     style={{ backgroundColor: color.value }}
                   >
                     {form.accentColor === color.value && (
@@ -281,28 +331,31 @@ export default function CreatePage() {
               {form.photoUrl ? (
                 <div className="relative">
                   <img src={form.photoUrl} alt="Uploaded" className="w-full max-h-72 object-contain rounded-lg bg-gray-50 dark:bg-gray-900" />
-                  <button onClick={() => update('photoUrl', '')} className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full text-sm font-bold hover:bg-red-600">×</button>
+                  <button onClick={() => update('photoUrl', '')} className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full text-sm font-bold hover:bg-red-600 appearance-none">×</button>
                 </div>
               ) : (
                 <>
-                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f) }} />
-                {photoUploading ? (
-                  <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
-                    <div className="text-gray-400 animate-pulse mb-2">Uploading…</div>
-                    <button type="button" onClick={skipPhoto} className="text-xs text-gray-400 hover:text-red-500 underline transition-colors">
-                      Skip photo
-                    </button>
-                  </div>
-                ) : (
-                  <div
-                    className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-pink-300 hover:bg-pink-50/30 transition-all"
-                    onClick={() => fileRef.current?.click()}
-                  >
-                    <div className="text-3xl mb-1">📸</div>
-                    <p className="text-sm text-gray-500">Tap to upload a photo</p>
-                    <p className="text-xs text-gray-400">JPG, PNG, GIF · Max 5MB · Optional</p>
-                  </div>
-                )}
+                  <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f) }} />
+                  {photoUploading ? (
+                    <div className="border-2 border-dashed border-pink-200 rounded-xl p-6 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <CircleProgress pct={uploadProgress} />
+                        <p className="text-sm text-gray-500">Uploading photo…</p>
+                        <button type="button" onClick={skipPhoto} className="text-xs text-gray-400 hover:text-red-500 underline transition-colors appearance-none">
+                          Skip photo
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-pink-300 hover:bg-pink-50/30 transition-all"
+                      onClick={() => fileRef.current?.click()}
+                    >
+                      <div className="text-3xl mb-1">📸</div>
+                      <p className="text-sm text-gray-500">Tap to upload a photo</p>
+                      <p className="text-xs text-gray-400">JPG, PNG, GIF · Max 5MB · Optional</p>
+                    </div>
+                  )}
                 </>
               )}
             </div>
@@ -310,7 +363,7 @@ export default function CreatePage() {
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700 flex items-center justify-between gap-2">
                 <span>{error}</span>
-                <button type="button" onClick={() => setError('')} className="shrink-0 text-red-400 hover:text-red-600 font-bold">×</button>
+                <button type="button" onClick={() => setError('')} className="shrink-0 text-red-400 hover:text-red-600 font-bold appearance-none">×</button>
               </div>
             )}
 
@@ -336,9 +389,27 @@ export default function CreatePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">🔒 Lock date (optional)</label>
-              <input type="date" className="card-input" value={form.lockDate} min={new Date().toISOString().split('T')[0]} onChange={(e) => update('lockDate', e.target.value)} />
-              <p className="text-xs text-gray-400 mt-1">No messages accepted after this date</p>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">🔒 Lock date &amp; time (optional)</label>
+              <input
+                type="datetime-local"
+                className="card-input"
+                value={form.lockDate}
+                min={new Date().toISOString().slice(0, 16)}
+                onChange={(e) => update('lockDate', e.target.value)}
+              />
+              <p className="text-xs text-gray-400 mt-1">No messages accepted after this date and time</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">📧 Email me the links (optional)</label>
+              <input
+                type="email"
+                className="card-input"
+                placeholder="your@email.com"
+                value={form.email}
+                onChange={(e) => update('email', e.target.value)}
+              />
+              <p className="text-xs text-gray-400 mt-1">We&apos;ll send both links so you never lose them</p>
             </div>
 
             {error && <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700">{error}</div>}
@@ -349,8 +420,6 @@ export default function CreatePage() {
                 {submitting ? 'Creating…' : '🎉 Create card!'}
               </button>
             </div>
-
-            <p className="text-center text-xs text-gray-400">No account needed · Free forever</p>
           </div>
         )}
       </div>

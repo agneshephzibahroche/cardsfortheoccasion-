@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { THEMES, ThemeKey, formatDate } from '@/lib/utils'
+import { THEMES, ThemeKey, formatDateTime } from '@/lib/utils'
 
 interface CardInfo {
   id: string
@@ -15,6 +15,27 @@ interface CardInfo {
   contributions: { id: string }[]
 }
 
+function CircleProgress({ pct }: { pct: number }) {
+  const r = 18
+  const circ = 2 * Math.PI * r
+  return (
+    <svg width="48" height="48" viewBox="0 0 44 44">
+      <circle cx="22" cy="22" r={r} fill="none" stroke="#e5e7eb" strokeWidth="3" />
+      <circle
+        cx="22" cy="22" r={r} fill="none"
+        stroke="#ec4899" strokeWidth="3" strokeLinecap="round"
+        strokeDasharray={circ}
+        strokeDashoffset={circ - (pct / 100) * circ}
+        transform="rotate(-90 22 22)"
+        style={{ transition: 'stroke-dashoffset 0.15s linear' }}
+      />
+      <text x="22" y="26" textAnchor="middle" fill="#6b7280" fontSize="9" fontWeight="600">
+        {pct}%
+      </text>
+    </svg>
+  )
+}
+
 export default function ContributePage({ params }: { params: { shareId: string } }) {
   const [card, setCard] = useState<CardInfo | null>(null)
   const [isLocked, setIsLocked] = useState(false)
@@ -25,12 +46,14 @@ export default function ContributePage({ params }: { params: { shareId: string }
   const [message, setMessage] = useState('')
   const [photoUrl, setPhotoUrl] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
 
   const fileRef = useRef<HTMLInputElement>(null)
   const uploadCancelledRef = useRef(false)
+  const xhrRef = useRef<XMLHttpRequest | null>(null)
 
   useEffect(() => {
     fetch(`/api/cards/${params.shareId}`)
@@ -43,25 +66,47 @@ export default function ContributePage({ params }: { params: { shareId: string }
       .finally(() => setLoading(false))
   }, [params.shareId])
 
-  const handlePhotoUpload = async (file: File) => {
+  const handlePhotoUpload = (file: File) => {
     uploadCancelledRef.current = false
     setUploading(true)
+    setUploadProgress(0)
+
     const fd = new FormData()
     fd.append('file', file)
-    try {
-      const res = await fetch('/api/upload', { method: 'POST', body: fd })
-      const data = await res.json()
-      if (!uploadCancelledRef.current) {
-        if (data.url) setPhotoUrl(data.url)
+
+    const xhr = new XMLHttpRequest()
+    xhrRef.current = xhr
+
+    xhr.upload.onprogress = (e) => {
+      if (uploadCancelledRef.current) return
+      if (e.lengthComputable) setUploadProgress(Math.round((e.loaded / e.total) * 92))
+    }
+
+    xhr.onload = () => {
+      if (uploadCancelledRef.current) return
+      try {
+        const data = JSON.parse(xhr.responseText)
+        if (data.url) { setPhotoUrl(data.url); setUploadProgress(100) }
         else setError(data.error || 'Upload failed')
-      }
-    } catch { if (!uploadCancelledRef.current) setError('Upload failed') }
-    finally { setUploading(false) }
+      } catch { setError('Upload failed') }
+      setUploading(false)
+    }
+
+    xhr.onerror = () => {
+      if (!uploadCancelledRef.current) setError('Upload failed')
+      setUploading(false)
+    }
+
+    xhr.open('POST', '/api/upload')
+    xhr.send(fd)
   }
 
   const skipPhoto = () => {
     uploadCancelledRef.current = true
+    xhrRef.current?.abort()
+    xhrRef.current = null
     setUploading(false)
+    setUploadProgress(0)
     setPhotoUrl('')
   }
 
@@ -122,7 +167,7 @@ export default function ContributePage({ params }: { params: { shareId: string }
               <span key={i} className="animate-float" style={{ animationDelay: `${i * 0.2}s` }}>{d}</span>
             ))}
           </div>
-          <button onClick={() => { setSubmitted(false); setName(''); setMessage(''); setPhotoUrl('') }} className="card-button-secondary">
+          <button onClick={() => { setSubmitted(false); setName(''); setMessage(''); setPhotoUrl('') }} className="card-button-secondary appearance-none">
             Add another message
           </button>
         </div>
@@ -148,7 +193,7 @@ export default function ContributePage({ params }: { params: { shareId: string }
           )}
           {isLocked && (
             <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 text-xs text-amber-700">
-              🔒 Contributions closed on {formatDate(card.lockDate!)}
+              🔒 Contributions closed on {formatDateTime(card.lockDate!)}
             </div>
           )}
         </div>
@@ -157,7 +202,7 @@ export default function ContributePage({ params }: { params: { shareId: string }
           <div className="bg-white dark:bg-stone-900 border border-gray-100 dark:border-stone-800 rounded-2xl shadow-lg p-8 text-center">
             <div className="text-5xl mb-4">🔒</div>
             <h2 className="font-display text-xl text-gray-800 dark:text-gray-200 mb-2">Contributions are closed</h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">The creator locked this card on {formatDate(card.lockDate!)}.</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">The creator locked this card on {formatDateTime(card.lockDate!)}.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="bg-white dark:bg-stone-900 border border-gray-100 dark:border-stone-800 rounded-2xl shadow-lg p-6 sm:p-8 space-y-4">
@@ -178,17 +223,20 @@ export default function ContributePage({ params }: { params: { shareId: string }
               {photoUrl ? (
                 <div className="relative">
                   <img src={photoUrl} alt="Uploaded" className="w-full max-h-64 object-contain rounded-lg bg-gray-50 dark:bg-gray-900" />
-                  <button type="button" onClick={() => setPhotoUrl('')} className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full text-sm font-bold">×</button>
+                  <button type="button" onClick={() => setPhotoUrl('')} className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full text-sm font-bold appearance-none">×</button>
                 </div>
               ) : (
                 <>
                   <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f) }} />
                   {uploading ? (
-                    <div className="border-2 border-dashed border-gray-200 rounded-xl p-5 text-center">
-                      <div className="text-gray-400 animate-pulse text-sm mb-2">Uploading…</div>
-                      <button type="button" onClick={skipPhoto} className="text-xs text-gray-400 hover:text-red-500 underline transition-colors">
-                        Skip photo
-                      </button>
+                    <div className="border-2 border-dashed border-pink-200 rounded-xl p-5 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <CircleProgress pct={uploadProgress} />
+                        <p className="text-sm text-gray-500">Uploading photo…</p>
+                        <button type="button" onClick={skipPhoto} className="text-xs text-gray-400 hover:text-red-500 underline transition-colors appearance-none">
+                          Skip photo
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div className="border-2 border-dashed border-gray-200 rounded-xl p-5 text-center cursor-pointer hover:border-pink-300 hover:bg-pink-50/30 transition-all" onClick={() => fileRef.current?.click()}>
@@ -211,8 +259,6 @@ export default function ContributePage({ params }: { params: { shareId: string }
             >
               {submitting ? 'Adding…' : '✉️ Add my message'}
             </button>
-
-            <p className="text-center text-xs text-gray-400">No account needed</p>
           </form>
         )}
       </div>
