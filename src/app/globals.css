@@ -185,10 +185,10 @@ button, [type='button'], [type='submit'], [type='reset'] {
   /* ===== INPUTS ===== */
   .card-input {
     @apply w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-800
-           placeholder-gray-400 focus:outline-none focus:border-pink-400 focus:ring-2
-           focus:ring-pink-100 transition-all duration-200 text-base font-heading font-normal
+           placeholder-gray-400 focus:outline-none focus:border-violet-400 focus:ring-2
+           focus:ring-violet-100 transition-all duration-200 text-base font-heading font-normal
            dark:bg-gray-800/80 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-500
-           dark:focus:border-pink-500 dark:focus:ring-pink-900/30;
+           dark:focus:border-violet-500 dark:focus:ring-violet-900/30;
   }
 
   .card-textarea {
@@ -197,10 +197,10 @@ button, [type='button'], [type='submit'], [type='reset'] {
 
   .card-button-primary {
     @apply inline-flex items-center justify-center px-6 py-3
-           bg-pink-500 text-white font-heading font-semibold tracking-wide
-           rounded-lg hover:bg-pink-600 active:bg-pink-700
+           bg-violet-600 text-white font-heading font-semibold tracking-wide
+           rounded-lg hover:bg-violet-700 active:bg-violet-800
            transition-colors duration-150 text-sm uppercase appearance-none
-           disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-pink-500;
+           disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-violet-600;
   }
 
   .card-button-secondary {

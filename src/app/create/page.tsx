@@ -23,6 +23,7 @@ interface Result {
   shareId: string
   revealId: string
   emailSent: boolean
+  emailError: string | null
 }
 
 function CircleProgress({ pct }: { pct: number }) {
@@ -57,7 +58,7 @@ function CopyButton({ text }: { text: string }) {
     <button
       onClick={copy}
       className={`shrink-0 px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-md transition-colors appearance-none ${
-        copied ? 'bg-green-500 text-white' : 'bg-pink-500 hover:bg-pink-600 text-white'
+        copied ? 'bg-green-500 text-white' : 'bg-violet-600 hover:bg-violet-700 text-white'
       }`}
     >
       {copied ? '✓ Copied' : 'Copy'}
@@ -71,7 +72,7 @@ export default function CreatePage() {
     recipientName: '',
     creatorName: '',
     theme: 'birthday',
-    accentColor: '#ec4899',
+    accentColor: '#8b5cf6',
     message: '',
     photoUrl: '',
     playlistUrl: '',
@@ -222,14 +223,14 @@ export default function CreatePage() {
             <div className={`rounded-xl p-3 mb-5 text-sm ${result.emailSent ? 'bg-green-50 text-green-800' : 'bg-amber-50 text-amber-800'}`}>
               {result.emailSent
                 ? `📧 Links sent to ${form.email}`
-                : `📧 Email couldn't be sent — save the links above manually`}
+                : `📧 Email couldn't be sent — save the links above manually${result.emailError ? ` (${result.emailError})` : ''}`}
             </div>
           )}
 
           <div className="flex gap-3">
             <Link href="/" className="card-button-secondary flex-1 text-center">Home</Link>
             <button
-              onClick={() => { setResult(null); setStep(1); setForm({ recipientName: '', creatorName: '', theme: 'birthday', accentColor: '#ec4899', message: '', photoUrl: '', playlistUrl: '', lockDate: '', email: '' }) }}
+              onClick={() => { setResult(null); setStep(1); setForm({ recipientName: '', creatorName: '', theme: 'birthday', accentColor: '#8b5cf6', message: '', photoUrl: '', playlistUrl: '', lockDate: '', email: '' }) }}
               className="card-button-primary flex-1"
             >
               Create another
@@ -248,7 +249,7 @@ export default function CreatePage() {
         <p className="text-gray-500 dark:text-gray-400 text-sm">Step {step} of 3</p>
         <div className="h-1.5 bg-gray-100 rounded-full mt-3 overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-pink-400 to-purple-400 rounded-full transition-all duration-500"
+            className="h-full bg-gradient-to-r from-blue-400 to-violet-500 rounded-full transition-all duration-500"
             style={{ width: `${(step / 3) * 100}%` }}
           />
         </div>

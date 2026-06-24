@@ -23,7 +23,7 @@ function CircleProgress({ pct }: { pct: number }) {
       <circle cx="22" cy="22" r={r} fill="none" stroke="#e5e7eb" strokeWidth="3" />
       <circle
         cx="22" cy="22" r={r} fill="none"
-        stroke="#ec4899" strokeWidth="3" strokeLinecap="round"
+        stroke="#7c3aed" strokeWidth="3" strokeLinecap="round"
         strokeDasharray={circ}
         strokeDashoffset={circ - (pct / 100) * circ}
         transform="rotate(-90 22 22)"

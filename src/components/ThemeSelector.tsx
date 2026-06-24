@@ -7,6 +7,17 @@ interface ThemeSelectorProps {
   onChange: (theme: ThemeKey) => void
 }
 
+const CARD_COLORS: Record<string, string> = {
+  birthday:      '#f472b6',
+  graduation:    '#60a5fa',
+  wedding:       '#c084fc',
+  baby:          '#38bdf8',
+  anniversary:   '#fb7185',
+  congratulations: '#fbbf24',
+  thankyou:      '#34d399',
+  getwell:       '#fb923c',
+}
+
 export default function ThemeSelector({ selected, onChange }: ThemeSelectorProps) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -15,19 +26,13 @@ export default function ThemeSelector({ selected, onChange }: ThemeSelectorProps
           key={key}
           type="button"
           onClick={() => onChange(key)}
-          className={`theme-card overflow-hidden ${selected === key ? 'selected' : ''}`}
-          style={{ background: `linear-gradient(135deg, ${theme.envelopeColor}, ${theme.envelopeFlapColor})` }}
+          className={`theme-card ${selected === key ? 'selected' : ''}`}
+          style={{ backgroundColor: CARD_COLORS[key] ?? theme.accent }}
         >
-          <div className="absolute inset-0 hidden dark:block bg-black/50 pointer-events-none" />
-          <div className="relative z-10">
-            <div className="text-3xl mb-1">{theme.emoji}</div>
-            <div className="text-xs font-semibold text-gray-700 dark:text-gray-100">{theme.label}</div>
-          </div>
+          <div className="text-3xl mb-1">{theme.emoji}</div>
+          <div className="text-xs font-semibold text-white drop-shadow">{theme.label}</div>
           {selected === key && (
-            <div
-              className="absolute top-2 right-2 z-20 w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold"
-              style={{ background: theme.accent }}
-            >
+            <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-white/30 flex items-center justify-center text-white text-xs font-bold">
               ✓
             </div>
           )}

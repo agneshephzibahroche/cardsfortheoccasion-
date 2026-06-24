@@ -43,12 +43,12 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16 pb-20 text-center">
-        <div className="inline-block bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/40 dark:to-purple-900/40 text-pink-700 dark:text-pink-300 text-xs sm:text-sm font-bold px-4 py-1.5 rounded-full mb-5">
+        <div className="inline-block bg-gradient-to-r from-blue-100 to-violet-100 dark:from-blue-900/40 dark:to-violet-900/40 text-violet-700 dark:text-violet-300 text-xs sm:text-sm font-bold px-4 py-1.5 rounded-full mb-5">
           ✨ Not just for birthdays
         </div>
         <h1 className="font-display text-4xl sm:text-6xl md:text-7xl text-gray-900 dark:text-gray-100 leading-tight mb-5">
           Cards for{' '}
-          <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-blue-500 to-violet-600 bg-clip-text text-transparent">
             every
           </span>{' '}
           occasion
@@ -73,7 +73,7 @@ export default function HomePage() {
         <p className="font-serif text-center text-gray-500 dark:text-gray-400 mb-12 max-w-xl mx-auto text-sm sm:text-base">Three simple steps to create something truly memorable.</p>
         <div className="grid sm:grid-cols-3 gap-6">
           {[
-            { step: '01', emoji: '✍️', title: 'Create your card', desc: 'Pick a theme, colour, and message. Add a photo and a playlist link. Set a lock date so no late additions slip in.', color: 'from-pink-400 to-rose-400' },
+            { step: '01', emoji: '✍️', title: 'Create your card', desc: 'Pick a theme, colour, and message. Add a photo and a playlist link. Set a lock date so no late additions slip in.', color: 'from-blue-400 to-violet-500' },
             { step: '02', emoji: '📤', title: 'Invite friends', desc: 'Share a link with anyone. They open it, write their message, and add a photo — done in seconds.', color: 'from-purple-400 to-indigo-400' },
             { step: '03', emoji: '🎉', title: 'Magical reveal', desc: 'Send the recipient their reveal link. The envelope dramatically unseals with animations, confetti, and music.', color: 'from-amber-400 to-orange-400' },
           ].map((item) => (
