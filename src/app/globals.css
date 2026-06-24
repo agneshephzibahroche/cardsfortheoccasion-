@@ -164,7 +164,7 @@ body {
 
   @media (max-width: 520px) {
     .postcard { flex-direction: column; }
-    .postcard-left { width: 100%; min-height: 110px; }
+    .postcard-left { width: 100%; min-height: 200px; }
     .postcard-right { border-left: none; border-top: 2px dashed #e5e7eb; }
   }
 
@@ -250,7 +250,7 @@ body {
   }
 
   @media (max-width: 520px) {
-    .postcard-right { border-top-color: #334155; }
+    .postcard-right { border-top-color: #334155; border-left: none; }
   }
 }
 

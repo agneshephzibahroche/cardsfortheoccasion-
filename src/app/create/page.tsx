@@ -280,7 +280,7 @@ export default function CreatePage() {
               <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Add a photo (optional)</label>
               {form.photoUrl ? (
                 <div className="relative">
-                  <img src={form.photoUrl} alt="Uploaded" className="w-full h-36 object-cover rounded-xl" />
+                  <img src={form.photoUrl} alt="Uploaded" className="w-full max-h-72 object-contain rounded-lg bg-gray-50 dark:bg-gray-900" />
                   <button onClick={() => update('photoUrl', '')} className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full text-sm font-bold hover:bg-red-600">×</button>
                 </div>
               ) : (
