@@ -94,12 +94,16 @@ export default function HomePage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {themes.map(([key, theme]) => (
             <Link key={key} href="/create"
-              className="group p-4 rounded-2xl border-2 border-transparent hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-lg transition-all duration-200 hover:-translate-y-1 text-center"
-              style={{ background: `linear-gradient(135deg, ${theme.envelopeColor}, ${theme.envelopeFlapColor}50)` }}
+              className="relative group p-4 rounded-2xl border-2 border-transparent hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-lg transition-all duration-200 hover:-translate-y-1 text-center overflow-hidden"
+              style={{ background: `linear-gradient(135deg, ${theme.envelopeColor}, ${theme.envelopeFlapColor})` }}
             >
-              <div className="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform">{theme.emoji}</div>
-              <div className="font-bold text-gray-800 text-xs sm:text-sm">{theme.label}</div>
-              <div className="text-xs text-gray-400 mt-0.5">{theme.decorations.slice(0, 3).join(' ')}</div>
+              {/* Dark mode overlay — kills the pastel-on-black metallic gloss */}
+              <div className="absolute inset-0 hidden dark:block bg-black/50 pointer-events-none" />
+              <div className="relative z-10">
+                <div className="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform">{theme.emoji}</div>
+                <div className="font-bold text-gray-800 dark:text-gray-100 text-xs sm:text-sm">{theme.label}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-300 mt-0.5">{theme.decorations.slice(0, 3).join(' ')}</div>
+              </div>
             </Link>
           ))}
         </div>
@@ -133,7 +137,7 @@ export default function HomePage() {
       </section>
 
       <footer className="border-t border-gray-100 dark:border-gray-800 py-6 text-center text-gray-400 text-sm">
-        Cards for the Occasion · Made with ❤️ for every milestone
+        Cards for the Occasion · Made by Agnes Hephzibah Roche
       </footer>
     </div>
   )
