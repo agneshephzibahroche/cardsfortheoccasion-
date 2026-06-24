@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import nodemailer from 'nodemailer'
 import { createCard } from '@/lib/db'
 import { shortId } from '@/lib/utils'
 
@@ -54,9 +55,10 @@ export async function POST(request: NextRequest) {
       try {
         if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
           // Gmail SMTP — no custom domain needed
-          const nodemailer = await import('nodemailer')
-          const transporter = nodemailer.default.createTransport({
-            service: 'gmail',
+          const transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
             auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
           })
           await transporter.sendMail({
