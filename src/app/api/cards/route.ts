@@ -29,23 +29,11 @@ export async function POST(request: NextRequest) {
     let emailSent = false
     let emailError: string | null = null
     if (email) {
-      if (!process.env.RESEND_API_KEY) {
-        emailError = 'RESEND_API_KEY not configured'
-        console.warn('RESEND_API_KEY not set — skipping email')
-      } else {
-        try {
-          const origin = process.env.NEXT_PUBLIC_BASE_URL ?? new URL(request.url).origin
-          const shareUrl = `${origin}/contribute/${card.share_id}`
-          const revealUrl = `${origin}/reveal/${card.reveal_id}`
+      const origin = process.env.NEXT_PUBLIC_BASE_URL ?? new URL(request.url).origin
+      const shareUrl = `${origin}/contribute/${card.share_id}`
+      const revealUrl = `${origin}/reveal/${card.reveal_id}`
 
-          const { Resend } = await import('resend')
-          const resend = new Resend(process.env.RESEND_API_KEY)
-
-          const { error: sendError } = await resend.emails.send({
-            from: process.env.FROM_EMAIL ?? 'Cards for the Occasion <onboarding@resend.dev>',
-            to: email,
-            subject: `Your card for ${recipientName} is ready! 🎉`,
-            html: `
+      const emailHtml = `
 <div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;padding:32px 16px;color:#111;">
   <h1 style="font-size:22px;margin:0 0 8px;">${creatorName}, your card is ready! 🎉</h1>
   <p style="color:#6b7280;margin:0 0 28px;">Here are the links for <strong>${recipientName}'s</strong> card. Keep them safe — save this email.</p>
@@ -61,9 +49,32 @@ export async function POST(request: NextRequest) {
   </div>
 
   <p style="color:#9ca3af;font-size:12px;">Cards for the Occasion</p>
-</div>`,
-          })
+</div>`
 
+      try {
+        if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+          // Gmail SMTP — no custom domain needed
+          const nodemailer = await import('nodemailer')
+          const transporter = nodemailer.default.createTransport({
+            service: 'gmail',
+            auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
+          })
+          await transporter.sendMail({
+            from: `Cards for the Occasion <${process.env.GMAIL_USER}>`,
+            to: email,
+            subject: `Your card for ${recipientName} is ready! 🎉`,
+            html: emailHtml,
+          })
+          emailSent = true
+        } else if (process.env.RESEND_API_KEY) {
+          const { Resend } = await import('resend')
+          const resend = new Resend(process.env.RESEND_API_KEY)
+          const { error: sendError } = await resend.emails.send({
+            from: process.env.FROM_EMAIL ?? 'Cards for the Occasion <onboarding@resend.dev>',
+            to: email,
+            subject: `Your card for ${recipientName} is ready! 🎉`,
+            html: emailHtml,
+          })
           if (sendError) {
             emailError = typeof sendError === 'object' && sendError !== null && 'message' in sendError
               ? String((sendError as { message: unknown }).message)
@@ -72,10 +83,13 @@ export async function POST(request: NextRequest) {
           } else {
             emailSent = true
           }
-        } catch (emailErr) {
-          emailError = emailErr instanceof Error ? emailErr.message : 'Unknown error'
-          console.error('Email send failed (non-fatal):', emailErr)
+        } else {
+          emailError = 'No email provider configured (add GMAIL_USER + GMAIL_APP_PASSWORD to Vercel env vars)'
+          console.warn('No email provider configured')
         }
+      } catch (emailErr) {
+        emailError = emailErr instanceof Error ? emailErr.message : 'Unknown error'
+        console.error('Email send failed (non-fatal):', emailErr)
       }
     }
 
