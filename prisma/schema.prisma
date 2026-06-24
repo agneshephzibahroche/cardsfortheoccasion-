@@ -1,0 +1,34 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Card {
+  id              String         @id @default(cuid())
+  shareId         String         @unique
+  revealId        String         @unique
+  creatorName     String
+  recipientName   String
+  theme           String         @default("birthday")
+  message         String
+  photoUrl        String?
+  playlistUrl     String?
+  lockDate        DateTime?
+  hasBeenRevealed Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  contributions   Contribution[]
+}
+
+model Contribution {
+  id              String   @id @default(cuid())
+  cardId          String
+  card            Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  contributorName String
+  message         String
+  photoUrl        String?
+  createdAt       DateTime @default(now())
+}
